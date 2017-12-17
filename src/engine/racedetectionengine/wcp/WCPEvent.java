@@ -6,7 +6,7 @@ import engine.racedetectionengine.RaceDetectionEvent;
 import event.Lock;
 import event.Thread;
 import event.Variable;
-import vectorclock.VectorClock;
+import rapidutil.vectorclock.VectorClock;
 
 public class WCPEvent extends RaceDetectionEvent<WCPState>{
 	public WCPEvent() {

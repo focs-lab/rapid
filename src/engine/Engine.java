@@ -4,7 +4,7 @@ import event.Event;
 import parse.ParserType;
 import parse.rv.RVParser;
 import parse.std.ParseStandard;
-import trace.Trace;
+import rapidutil.trace.Trace;
 
 public abstract class Engine<E extends Event> {
 	protected ParserType parserType;

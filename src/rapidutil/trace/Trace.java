@@ -1,4 +1,4 @@
-package trace;
+package rapidutil.trace;
 
 import java.util.ArrayList;
 import java.util.Comparator;

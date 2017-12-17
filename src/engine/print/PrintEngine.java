@@ -9,7 +9,7 @@ import parse.ParserType;
 import parse.csv.ParseCSV;
 import parse.rv.RVParser;
 import parse.std.ParseStandard;
-import trace.TraceAndDataSets;
+import rapidutil.trace.TraceAndDataSets;
 
 public class PrintEngine extends Engine<Event> {
 

@@ -15,8 +15,8 @@ import event.Thread;
 import event.Variable;
 import parse.util.CannotParseException;
 import parse.util.EventInfo;
-import trace.Trace;
-import trace.TraceAndDataSets;
+import rapidutil.trace.Trace;
+import rapidutil.trace.TraceAndDataSets;
 
 
 public class ParseCSV {

@@ -1,7 +1,7 @@
 package engine.racedetectionengine.hb;
 
 import engine.racedetectionengine.RaceDetectionEvent;
-import vectorclock.VectorClock;
+import rapidutil.vectorclock.VectorClock;
 
 public class HBEvent extends RaceDetectionEvent<HBState> {
 	public HBEvent() {

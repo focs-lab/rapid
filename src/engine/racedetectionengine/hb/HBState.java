@@ -9,7 +9,7 @@ import engine.racedetectionengine.State;
 import event.Lock;
 import event.Thread;
 import event.Variable;
-import vectorclock.VectorClock;
+import rapidutil.vectorclock.VectorClock;
 
 public class HBState extends State{
 

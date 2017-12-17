@@ -6,9 +6,9 @@ import engine.racedetectionengine.RaceDetectionEngine;
 import event.Thread;
 import parse.ParserType;
 import parse.csv.ParseCSV;
-import trace.TraceAndDataSets;
 import parse.rv.RVParser;
 import parse.std.ParseStandard;
+import rapidutil.trace.TraceAndDataSets;
 
 public class HBEngine extends RaceDetectionEngine<HBState, HBEvent> {
 
