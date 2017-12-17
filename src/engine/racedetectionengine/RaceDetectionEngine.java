@@ -15,11 +15,11 @@ public abstract class RaceDetectionEngine<St extends State, RDE extends RaceDete
 		super(pType);
 	}
 
-	protected abstract void initReaderStuffRV(String trace_folder);
+	protected abstract void initializeReaderRV(String trace_folder);
 
-	protected abstract void initReaderStuffCSV(String trace_file);
+	protected abstract void initializeReaderCSV(String trace_file);
 
-	protected abstract void initReaderStuffSTD(String trace_file);
+	protected abstract void initializeReaderSTD(String trace_file);
 
 	protected abstract boolean skipEvent(RDE handlerEvent);
 

@@ -17,21 +17,21 @@ public abstract class Engine<E extends Event> {
 		this.parserType = pType;
 	}
 	
-	protected void initReaderStuff(String trace_folder){
+	protected void initializeReader(String trace_folder){
 		if(this.parserType.isRV()){
-			initReaderStuffRV(trace_folder);
+			initializeReaderRV(trace_folder);
 		}
 		else if(this.parserType.isCSV()){
-			initReaderStuffCSV(trace_folder);
+			initializeReaderCSV(trace_folder);
 		}
 		else if(this.parserType.isSTD()){
-			initReaderStuffSTD(trace_folder);
+			initializeReaderSTD(trace_folder);
 		}
 	}
 	
-	protected abstract void initReaderStuffRV(String trace_folder);
+	protected abstract void initializeReaderRV(String trace_folder);
 	
-	protected abstract void initReaderStuffCSV(String trace_file);
+	protected abstract void initializeReaderCSV(String trace_file);
 	
-	protected abstract void initReaderStuffSTD(String trace_file);
+	protected abstract void initializeReaderSTD(String trace_file);
 }

@@ -30,7 +30,7 @@ public class PrintEngine extends Engine<Event> {
 
 	public PrintEngine(ParserType pType, String trace_folder) {
 		super(pType);
-		initReaderStuff(trace_folder);
+		initializeReader(trace_folder);
 		initType2String();
 		handlerEvent = new Event();
 		tIndexMap = new HashMap<Thread, Integer> ();
@@ -143,20 +143,20 @@ public class PrintEngine extends Engine<Event> {
 	}
 
 	@Override
-	protected void initReaderStuffRV(String trace_folder) {
+	protected void initializeReaderRV(String trace_folder) {
 		rvParser = new RVParser(trace_folder, null);
 		this.totThreads = rvParser.getTotalThreads();
 	}
 
 	@Override
-	protected void initReaderStuffCSV(String trace_file) {
+	protected void initializeReaderCSV(String trace_file) {
 		TraceAndDataSets traceAndDataSets = ParseCSV.parse(true, trace_file);
 		this.trace = traceAndDataSets.getTrace();
 		this.totThreads = traceAndDataSets.getThreadSet().size();
 	}
 
 	@Override
-	protected void initReaderStuffSTD(String trace_file) {
+	protected void initializeReaderSTD(String trace_file) {
 		stdParser = new ParseStandard(trace_file, true);
 		totThreads = stdParser.getThreadSet().size();
 	}
