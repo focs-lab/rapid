@@ -8,6 +8,7 @@ import engine.Engine;
 import event.Event;
 import parse.ParserType;
 import parse.csv.ParseCSV;
+import parse.rr.ParseRoadRunner;
 import parse.rv.ParseRVPredict;
 import parse.std.ParseStandard;
 import util.trace.TraceAndDataSets;
@@ -85,6 +86,11 @@ public class AccessTimesEngine extends Engine<Event> {
 	@Override
 	protected void initializeReaderSTD(String trace_file) {
 		stdParser = new ParseStandard(trace_file);
+	}
+	
+	@Override
+	protected void initializeReaderRR(String trace_file) {
+		rrParser = new ParseRoadRunner(trace_file);
 	}
 
 	public void computeLastAccessTimes(){
@@ -314,6 +320,14 @@ public class AccessTimesEngine extends Engine<Event> {
 		long eventIndex = 0;
 		while(stdParser.hasNext()){
 			stdParser.getNextEvent(handlerEvent);
+			eventIndex = handlerEvent.getAuxId();
+			processEvent(eventIndex);
+		}
+	}
+	
+	public void computeLastAccessTimesRR() {
+		long eventIndex = 0;
+		while(rrParser.checkAndGetNext(handlerEvent)){
 			eventIndex = handlerEvent.getAuxId();
 			processEvent(eventIndex);
 		}

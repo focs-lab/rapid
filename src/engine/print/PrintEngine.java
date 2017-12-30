@@ -7,6 +7,7 @@ import event.EventType;
 import event.Thread;
 import parse.ParserType;
 import parse.csv.ParseCSV;
+import parse.rr.ParseRoadRunner;
 import parse.rv.ParseRVPredict;
 import parse.std.ParseStandard;
 import util.trace.TraceAndDataSets;
@@ -47,6 +48,9 @@ public class PrintEngine extends Engine<Event> {
 		else if(this.parserType.isSTD()){
 			analyzeTraceSTD(outputType);
 		}
+		else if(this.parserType.isRR()){
+			analyzeTraceRR(outputType);
+		}
 	}
 
 	private void analyzeTraceRV(ParserType outputType) {
@@ -72,6 +76,14 @@ public class PrintEngine extends Engine<Event> {
 	private void analyzeTraceCSV(ParserType outputType) {
 		for(int eCount = 0; eCount < trace.getSize(); eCount ++){
 			handlerEvent = trace.getEventAt(eCount);
+			if(! skipEvent(handlerEvent)){
+				processEvent(outputType);
+			}
+		}
+	}
+	
+	private void analyzeTraceRR(ParserType outputType) {
+		while(rrParser.checkAndGetNext(handlerEvent)){
 			if(! skipEvent(handlerEvent)){
 				processEvent(outputType);
 			}
@@ -158,6 +170,12 @@ public class PrintEngine extends Engine<Event> {
 	@Override
 	protected void initializeReaderSTD(String trace_file) {
 		stdParser = new ParseStandard(trace_file, true);
+		totThreads = stdParser.getThreadSet().size();
+	}
+	
+	@Override
+	protected void initializeReaderRR(String trace_file) {
+		rrParser = new ParseRoadRunner(trace_file, true);
 		totThreads = stdParser.getThreadSet().size();
 	}
 

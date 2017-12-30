@@ -1,7 +1,7 @@
 package event;
 
 public enum EventType {
-	ACQUIRE, RELEASE, READ, WRITE, FORK, JOIN, DUMMY;
+	ACQUIRE, RELEASE, READ, WRITE, FORK, JOIN, BEGIN, END, DUMMY;
 	
 	public boolean isAcquire(){
 		return this.ordinal() == ACQUIRE.ordinal();
@@ -26,6 +26,14 @@ public enum EventType {
 	public boolean isJoin(){
 		return this.ordinal() == JOIN.ordinal();
 	}
+	
+	public boolean isBegin(){
+		return this.ordinal() == BEGIN.ordinal();
+	}
+	
+	public boolean isEnd(){
+		return this.ordinal() == END.ordinal();
+	}
 
 	public boolean isLockType() {
 		return this.isAcquire() || this.isRelease();
@@ -43,6 +51,10 @@ public enum EventType {
 		return isLockType() || isExtremeType();
 	} */
 	
+	public boolean isTransactionType(){
+		return isBegin() || isEnd() ;
+	}
+	
 	public boolean isDummyType(){
 		return this.ordinal() == DUMMY.ordinal();
 	}
@@ -55,6 +67,8 @@ public enum EventType {
 		if(this.isWrite()) str = "WRITE";
 		if(this.isFork()) str = "FORK";
 		if(this.isJoin()) str = "JOIN";
+		if(this.isBegin()) str = "BEGIN";
+		if(this.isEnd()) str = "END";
 		return str;
 	}
 }

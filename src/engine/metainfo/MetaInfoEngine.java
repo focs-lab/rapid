@@ -6,6 +6,7 @@ import engine.Engine;
 import event.Event;
 import parse.ParserType;
 import parse.csv.ParseCSV;
+import parse.rr.ParseRoadRunner;
 import parse.rv.ParseRVPredict;
 import parse.std.ParseStandard;
 import util.trace.TraceAndDataSets;
@@ -65,6 +66,11 @@ public class MetaInfoEngine extends Engine<Event>{
 	protected void initializeReaderSTD(String trace_file) {
 		stdParser = new ParseStandard(trace_file);
 	}
+	
+	@Override
+	protected void initializeReaderRR(String trace_file) {
+		rrParser = new ParseRoadRunner(trace_file);
+	}
 
 	public void analyzeTrace() {
 		if(this.parserType.isRV()){
@@ -75,6 +81,9 @@ public class MetaInfoEngine extends Engine<Event>{
 		}
 		else if(this.parserType.isSTD()){
 			analyzeTraceSTD();
+		}
+		else if(this.parserType.isRR()){
+			analyzeTraceRR();
 		}
 	}
 
@@ -156,4 +165,13 @@ public class MetaInfoEngine extends Engine<Event>{
 		}
 		postAnalysis();
 	}
+	
+	public void analyzeTraceRR() {
+		while(rrParser.checkAndGetNext(handlerEvent)){
+			eventCount = eventCount + 1;
+			processEvent();
+		}
+		postAnalysis();
+	}
+
 }
