@@ -6,7 +6,7 @@ import engine.Engine;
 import event.Event;
 import parse.ParserType;
 import parse.csv.ParseCSV;
-import parse.rv.ParserRVPredict;
+import parse.rv.ParseRVPredict;
 import parse.std.ParseStandard;
 import util.trace.TraceAndDataSets;
 
@@ -52,7 +52,7 @@ public class MetaInfoEngine extends Engine<Event>{
 
 	@Override
 	protected void initializeReaderRV(String trace_folder){
-		rvParser = new ParserRVPredict(trace_folder, null);
+		rvParser = new ParseRVPredict(trace_folder, null);
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import engine.racedetectionengine.RaceDetectionEngine;
 import event.Thread;
 import parse.ParserType;
 import parse.csv.ParseCSV;
-import parse.rv.ParserRVPredict;
+import parse.rv.ParseRVPredict;
 import parse.std.ParseStandard;
 import util.trace.TraceAndDataSets;
 
@@ -22,7 +22,7 @@ public class HBEngine extends RaceDetectionEngine<HBState, HBEvent> {
 	
 	@Override
 	protected void initializeReaderRV(String trace_folder){
-		rvParser = new ParserRVPredict(trace_folder, this.threadSet);
+		rvParser = new ParseRVPredict(trace_folder, this.threadSet);
 	}
 
 	@Override
