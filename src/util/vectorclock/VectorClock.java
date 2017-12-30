@@ -1,4 +1,4 @@
-package rapidutil.vectorclock;
+package util.vectorclock;
 
 import java.util.Vector;
 

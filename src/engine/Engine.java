@@ -2,14 +2,14 @@ package engine;
 
 import event.Event;
 import parse.ParserType;
-import parse.rv.RVParser;
+import parse.rv.ParserRVPredict;
 import parse.std.ParseStandard;
-import rapidutil.trace.Trace;
+import util.trace.Trace;
 
 public abstract class Engine<E extends Event> {
 	protected ParserType parserType;
 	protected Trace trace; //CSV
-	protected RVParser rvParser;//RV
+	protected ParserRVPredict rvParser;//RV
 	protected ParseStandard stdParser; //STD
 	protected E handlerEvent;
 	

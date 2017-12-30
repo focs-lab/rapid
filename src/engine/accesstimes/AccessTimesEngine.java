@@ -8,9 +8,9 @@ import engine.Engine;
 import event.Event;
 import parse.ParserType;
 import parse.csv.ParseCSV;
-import parse.rv.RVParser;
+import parse.rv.ParserRVPredict;
 import parse.std.ParseStandard;
-import rapidutil.trace.TraceAndDataSets;
+import util.trace.TraceAndDataSets;
 
 public class AccessTimesEngine extends Engine<Event> {
 
@@ -73,7 +73,7 @@ public class AccessTimesEngine extends Engine<Event> {
 
 	@Override
 	protected void initializeReaderRV(String trace_folder){
-		rvParser = new RVParser(trace_folder, null);
+		rvParser = new ParserRVPredict(trace_folder, null);
 	}
 
 	@Override

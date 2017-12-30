@@ -6,7 +6,7 @@ import java.util.HashSet;
 
 import event.Lock;
 import event.Thread;
-import rapidutil.vectorclock.VectorClock;
+import util.vectorclock.VectorClock;
 
 //Data structure for managing the collection of all queues
 public class WCPView {

@@ -1,4 +1,4 @@
-package rapidutil.trace;
+package util.trace;
 
 import java.util.HashSet;
 

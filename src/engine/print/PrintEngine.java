@@ -7,9 +7,9 @@ import event.EventType;
 import event.Thread;
 import parse.ParserType;
 import parse.csv.ParseCSV;
-import parse.rv.RVParser;
+import parse.rv.ParserRVPredict;
 import parse.std.ParseStandard;
-import rapidutil.trace.TraceAndDataSets;
+import util.trace.TraceAndDataSets;
 
 public class PrintEngine extends Engine<Event> {
 
@@ -144,7 +144,7 @@ public class PrintEngine extends Engine<Event> {
 
 	@Override
 	protected void initializeReaderRV(String trace_folder) {
-		rvParser = new RVParser(trace_folder, null);
+		rvParser = new ParserRVPredict(trace_folder, null);
 		this.totThreads = rvParser.getTotalThreads();
 	}
 

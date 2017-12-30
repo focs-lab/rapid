@@ -7,9 +7,9 @@ import engine.racedetectionengine.RaceDetectionEngine;
 import event.Thread;
 import parse.ParserType;
 import parse.csv.ParseCSV;
-import parse.rv.RVParser;
+import parse.rv.ParserRVPredict;
 import parse.std.ParseStandard;
-import rapidutil.trace.TraceAndDataSets;
+import util.trace.TraceAndDataSets;
 
 public class WCPEngine extends RaceDetectionEngine<WCPState, WCPEvent>{
 	
@@ -56,7 +56,7 @@ public class WCPEngine extends RaceDetectionEngine<WCPState, WCPEvent>{
 
 	@Override
 	protected void initializeReaderRV(String trace_folder){
-		rvParser = new RVParser(trace_folder, this.threadSet);
+		rvParser = new ParserRVPredict(trace_folder, this.threadSet);
 	}
 
 	@Override

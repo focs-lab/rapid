@@ -1,6 +1,6 @@
 package engine.racedetectionengine.wcp;
 
-import rapidutil.vectorclock.VectorClock;
+import util.vectorclock.VectorClock;
 
 //Struct for pair of vector clocks to be stored in queue
 public class WCPClockPair {

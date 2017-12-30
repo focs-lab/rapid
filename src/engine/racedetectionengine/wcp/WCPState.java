@@ -10,7 +10,7 @@ import engine.racedetectionengine.State;
 import event.Lock;
 import event.Thread;
 import event.Variable;
-import rapidutil.vectorclock.VectorClock;
+import util.vectorclock.VectorClock;
 
 //Manages the clocks and other data structures used by the WCP algorithm
 public class WCPState extends State {
