@@ -12,7 +12,7 @@ import parse.util.EventInfo;
 
 public class Parse {
 	// ACQUIRE, RELEASE, READ, WRITE, FORK, JOIN;
-		public static String matchStr[] = { "acq", "rel", "r", "w", "start", "join", "dummy" };
+		public static String matchStr[] = { "acq", "rel", "r", "w", "start", "join", "enter", "exit", "dummy" };
 		
 		public static String prefixPattern = "^(";
 		public static String midFixPattern = String.join("|", matchStr);

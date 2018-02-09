@@ -176,7 +176,7 @@ public class PrintEngine extends Engine<Event> {
 	@Override
 	protected void initializeReaderRR(String trace_file) {
 		rrParser = new ParseRoadRunner(trace_file, true);
-		totThreads = stdParser.getThreadSet().size();
+		totThreads = rrParser.getThreadSet().size();
 	}
 
 }
