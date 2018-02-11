@@ -157,4 +157,22 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 		return false;
 	}
 	/************************************************/
+
+	@Override
+	public void printRaceInfoTransactionType(HBState state, int verbosity) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean HandleSubBegin(HBState state, int verbosity) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean HandleSubEnd(HBState state, int verbosity) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

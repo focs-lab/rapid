@@ -88,7 +88,7 @@ public class WCPEvent extends RaceDetectionEvent<WCPState>{
 	//Handler for acquire event
 	@Override
 	public boolean HandleSubAcquire(WCPState state, int verbosity){
-
+		
 		/*** Extra Pre-processing for reEntrants *****/
 		boolean reEntrant = state.isLockAcquired(this.getThread(), this.getLock());
 		/*** Extra Pre-processing for reEntrants done *****/
@@ -113,7 +113,7 @@ public class WCPEvent extends RaceDetectionEvent<WCPState>{
 		}
 
 		this.printRaceInfo(state, verbosity);
-
+		
 		return false;
 	}
 
@@ -353,5 +353,23 @@ public class WCPEvent extends RaceDetectionEvent<WCPState>{
 		return false;
 	}
 	/************************************************/
+
+	@Override
+	public void printRaceInfoTransactionType(WCPState state, int verbosity) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean HandleSubBegin(WCPState state, int verbosity) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean HandleSubEnd(WCPState state, int verbosity) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

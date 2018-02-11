@@ -28,6 +28,8 @@ public abstract class RaceDetectionEvent<S extends State> extends Event {
 		if(this.getType().isWrite())	raceDetected = this.HandleSubWrite(state, verbosity);
 		if(this.getType().isFork()) 	raceDetected = this.HandleSubFork(state, verbosity);
 		if(this.getType().isJoin())		raceDetected = this.HandleSubJoin(state, verbosity);
+		if(this.getType().isBegin()) 	raceDetected = this.HandleSubBegin(state, verbosity);
+		if(this.getType().isEnd())		raceDetected = this.HandleSubEnd(state, verbosity);
 
 		return raceDetected;
 	}
@@ -35,6 +37,7 @@ public abstract class RaceDetectionEvent<S extends State> extends Event {
 	public abstract void printRaceInfoLockType(S state, int verbosity);
 	public abstract void printRaceInfoAccessType(S state, int verbosity);
 	public abstract void printRaceInfoExtremeType(S state, int verbosity);
+	public abstract void printRaceInfoTransactionType(S state, int verbosity);
 	
 	public abstract boolean HandleSubAcquire(S state, int verbosity);
 	public abstract boolean HandleSubRelease(S state, int verbosity);
@@ -42,5 +45,7 @@ public abstract class RaceDetectionEvent<S extends State> extends Event {
 	public abstract boolean HandleSubWrite(S state, int verbosity);
 	public abstract boolean HandleSubFork(S state, int verbosity);
 	public abstract boolean HandleSubJoin(S state, int verbosity);
+	public abstract boolean HandleSubBegin(S state, int verbosity);
+	public abstract boolean HandleSubEnd(S state, int verbosity);
 
 }

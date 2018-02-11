@@ -52,6 +52,7 @@ public class ParseStandard {
 			while(this.hasNext()){
 				getNextEvent(e);
 			}
+			this.totEvents = 0; //Resetting totEvents is required to ensure correct AuxId
 			try{
 				bufferedReader = new BufferedReader(new FileReader(traceFile));
 			}

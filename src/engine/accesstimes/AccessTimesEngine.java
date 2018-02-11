@@ -103,6 +103,9 @@ public class AccessTimesEngine extends Engine<Event> {
 		else if(this.parserType.isSTD()){
 			computeLastAccessTimesSTD();
 		}
+		else if(this.parserType.isRR()){
+			computeLastAccessTimesRR();
+		}
 	}
 
 	public void processEvent(long eventIndex){

@@ -45,9 +45,7 @@ public class WCPEngine extends RaceDetectionEngine<WCPState, WCPEvent>{
 		this.state.variableToWriteEquivalenceClass = accessTimesEngine.variableToWriteEquivalenceClass;		
 
 		this.variableToThreadSet = accessTimesEngine.variableToThreadSet;
-		this.lockToThreadSet = accessTimesEngine.lockToThreadSet;
-
-		
+		this.lockToThreadSet = accessTimesEngine.lockToThreadSet;		
 	}
 	
 	protected boolean skipEvent(WCPEvent handlerEvent){

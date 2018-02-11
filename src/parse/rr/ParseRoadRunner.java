@@ -56,6 +56,7 @@ public class ParseRoadRunner {
 		if(computeThreadSetAPriori){
 			Event e = new Event ();
 			while(this.checkAndGetNext(e)){} //Read this trace to calculate threadSet
+			this.totEvents = 0; //Reset total number of events. This is needed so that AuxId is set correctly.
 			try{
 				bufferedReader = new BufferedReader(new FileReader(traceFile));
 			}
