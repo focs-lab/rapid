@@ -171,6 +171,10 @@ public class VectorClock {
 		}
 	}
 	
+	public int getClockIndex(int tIndex){
+		return this.clock.get(tIndex);
+	}
+	
 	public void setClockIndex(int tIndex, int tValue){
 		this.clock.set(tIndex, (Integer) tValue);
 	}
