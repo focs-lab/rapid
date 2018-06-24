@@ -84,7 +84,7 @@ public class GoldilocksEvent extends RaceDetectionEvent<GoldilocksState> {
 			}
 		}
 		if(raceDetected){
-			System.out.println("Goldilocks algorithm detected a race.";
+			System.out.println("Goldilocks algorithm detected a race");
 		}
 		
 		if(!state.readLockSet.containsKey(tLock)){
