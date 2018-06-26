@@ -105,7 +105,7 @@ The current distribution includes the following race detection engines :
 
 The above packages also give a fair idea on how to write your favorite dynamic analysis engine in RAPID.
 
-**Generic Utilities** - For implementing dynamic analysis engines, one might use sophisticated data structures, such as vector clocks (VC), adaptive VCs (_epoch_), etc. All these utilities can be implemented in the package `util`. Currently, we have implemented the VectorClock class, and use it in the two race detection engines implemented.
+**Generic Utilities** - For implementing dynamic analysis engines, one might use sophisticated data structures, such as vector clocks (VC), adaptive VCs (_epoch_), etc. We have implemented popular ones in the package `util`, and these are being used in some race detection engines.
 
 **Parsing Utilities** - The parsing functions for reading traces in the three formats RVPredict, CSV, STD are implemented in `parse` package. The parsing utilities for RVPredict format have been obfuscated and have been provided only as jar files
 
