@@ -1,4 +1,4 @@
-package engine.racedetectionengine.hb_epoch;
+package engine.racedetectionengine.shb;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,10 +9,9 @@ import engine.racedetectionengine.State;
 import event.Lock;
 import event.Thread;
 import event.Variable;
-import util.vectorclock.SemiAdaptiveVC;
 import util.vectorclock.VectorClock;
 
-public class HBEpochState extends State {
+public class SHBState extends State {
 
 	// Internal data
 	private HashMap<Thread, Integer> threadToIndex;
@@ -23,13 +22,16 @@ public class HBEpochState extends State {
 	private int numVariables;
 
 	// Data used for algorithm
-	private ArrayList<Integer> clockThread;
-	public ArrayList<VectorClock> HBPredecessorThread;
+	public ArrayList<VectorClock> clockThread;
 	public ArrayList<VectorClock> lastReleaseLock;
-	public ArrayList<SemiAdaptiveVC> readVariable;
-	public ArrayList<SemiAdaptiveVC> writeVariable;
+	public ArrayList<VectorClock> readVariable;
+	public ArrayList<VectorClock> writeVariable;
+	public ArrayList<VectorClock> lastWriteVariable;
+	
+	//Book-keeping the last-write's location
+	public ArrayList<Integer> lastWriteVariableLocId;
 
-	public HBEpochState(HashSet<Thread> tSet) {
+	public SHBState(HashSet<Thread> tSet) {
 		initInternalData(tSet);
 		initData(tSet);
 	}
@@ -58,24 +60,29 @@ public class HBEpochState extends State {
 	}
 
 	public void initData(HashSet<Thread> tSet) {
-		// Initialize clockThread
-		this.clockThread = new ArrayList<Integer>();
+		
+		// initialize clockThread
+		this.clockThread = new ArrayList<VectorClock>();
+		initialize1DArrayOfVectorClocksWithBottom(this.clockThread, this.numThreads);		
 		for (int i = 0; i < this.numThreads; i++) {
-			this.clockThread.add((Integer)1);
+			VectorClock C_t = this.clockThread.get(i);
+			C_t.setClockIndex(i, 1);
 		}
 		
-		// initialize HBPredecessorThread
-		this.HBPredecessorThread = new ArrayList<VectorClock>();
-		initialize1DArrayOfVectorClocksWithBottom(this.HBPredecessorThread, this.numThreads);
-
 		// initialize lastReleaseLock
 		this.lastReleaseLock = new ArrayList<VectorClock>();
 
 		// initialize readVariable
-		this.readVariable = new ArrayList<SemiAdaptiveVC>();
+		this.readVariable = new ArrayList<VectorClock>();
 
 		// initialize writeVariable
-		this.writeVariable = new ArrayList<SemiAdaptiveVC>();
+		this.writeVariable = new ArrayList<VectorClock>();
+		
+		// initialize lastWriteVariable
+		this.lastWriteVariable = new ArrayList<VectorClock>();
+		
+		//initialize locationIds
+		this.lastWriteVariableLocId = new ArrayList<Integer> ();
 	}
 	
 	// Access methods
@@ -102,32 +109,19 @@ public class HBEpochState extends State {
 		if(!variableToIndex.containsKey(v)){
 			variableToIndex.put(v, this.numVariables);
 			this.numVariables ++;
-			readVariable	.add(new SemiAdaptiveVC());
-			writeVariable	.add(new SemiAdaptiveVC());
+			readVariable			.add(new VectorClock(this.numThreads));
+			writeVariable			.add(new VectorClock(this.numThreads));
+			lastWriteVariable		.add(new VectorClock(this.numThreads));
+			lastWriteVariableLocId	.add(-1); //Initialize loc id's to be -1
 		}
 		return variableToIndex.get(v);
 	}
-
-	public int getClockThread(Thread t) {
-		int tIndex = threadToIndex.get(t);
-		return clockThread.get(tIndex);
-	}
 	
-	public VectorClock generateVectorClockFromClockThread(Thread t) {
-		int tIndex = threadToIndex.get(t);
-
-		int tValue = getClockThread(t);
-		VectorClock pred = getVectorClock(HBPredecessorThread, t);
-		VectorClock hbClock = new VectorClock(pred);
-		
-		hbClock.setClockIndex(tIndex, tValue);
-		return hbClock;
-	}
-
 	public void incClockThread(Thread t) {
 		int tIndex = threadToIndex.get(t);
-		int origVal = clockThread.get(tIndex);
-		clockThread.set(tIndex, (Integer)(origVal + 1));
+		VectorClock C_t = getVectorClock(clockThread, t);
+		int origVal = C_t.getClockIndex(tIndex);
+		C_t.setClockIndex(tIndex, origVal + 1);
 	}
 
 	public VectorClock getVectorClock(ArrayList<VectorClock> arr, Thread t) {
@@ -145,22 +139,16 @@ public class HBEpochState extends State {
 		return getVectorClockFrom1DArray(arr, vIndex);
 	}
 	
-	private <T> T getTFrom1DArray(ArrayList<T> arr, int index) {
-		if (index < 0 || index >= arr.size()) {
-			throw new IllegalArgumentException("Illegal Out of Bound access");
-		}
-		return arr.get(index);
-	}
-	
-	public <T> T getAdaptiveVC(ArrayList<T> arr, Variable v) {
+	public int getLWLocId(Variable v){
 		int vIndex = checkAndAddVariable(v);
-		return getTFrom1DArray(arr, vIndex);
+		return this.lastWriteVariableLocId.get(vIndex);
 	}
 	
-	public int getThreadIndex(Thread t){
-		return threadToIndex.get(t);
+	public void setLWLocId(Variable v, int loc){
+		int vIndex = checkAndAddVariable(v);
+		this.lastWriteVariableLocId.set(vIndex, loc);
 	}
-	
+
 	public void setIndex(VectorClock vc, Thread t, int val){
 		int tIndex = threadToIndex.get(t);
 		vc.setClockIndex(tIndex, val);
@@ -170,11 +158,11 @@ public class HBEpochState extends State {
 		int tIndex = threadToIndex.get(t);
 		return vc.getClockIndex(tIndex);
 	}
-
+	
 	public void printThreadClock(){
 		ArrayList<VectorClock> printVC = new ArrayList<VectorClock>();
 		for(Thread thread : threadToIndex.keySet()){
-			VectorClock C_t = generateVectorClockFromClockThread(thread);
+			VectorClock C_t = getVectorClock(clockThread, thread);
 			printVC.add(C_t);
 		}
 		System.out.println(printVC);

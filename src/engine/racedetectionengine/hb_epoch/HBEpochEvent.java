@@ -14,7 +14,7 @@ public class HBEpochEvent extends RaceDetectionEvent<HBEpochState> {
 	@Override
 	public void printRaceInfoLockType(HBEpochState state, int verbosity) {
 		if(this.getType().isLockType()){
-			if(state.verbosity == 2){
+			if(verbosity == 2){
 				String str = "#";
 				str += Integer.toString(getLocId());
 				str += "|";
@@ -34,7 +34,7 @@ public class HBEpochEvent extends RaceDetectionEvent<HBEpochState> {
 	@Override
 	public void printRaceInfoAccessType(HBEpochState state, int verbosity) {
 		if(this.getType().isAccessType()){
-			if(state.verbosity == 1 || state.verbosity == 2){
+			if(verbosity == 1 || verbosity == 2){
 				String str = "#";
 				str += Integer.toString(getLocId());
 				str += "|";
@@ -56,7 +56,7 @@ public class HBEpochEvent extends RaceDetectionEvent<HBEpochState> {
 	@Override
 	public void printRaceInfoExtremeType(HBEpochState state, int verbosity) {
 		if(this.getType().isExtremeType()){
-			if(state.verbosity == 2){
+			if(verbosity == 2){
 				String str = "#";
 				str += Integer.toString(getLocId());
 				str += "|";
@@ -72,13 +72,17 @@ public class HBEpochEvent extends RaceDetectionEvent<HBEpochState> {
 			}
 		}		
 	}
+	
+	@Override
+	public void printRaceInfoTransactionType(HBEpochState state, int verbosity) {
+	}
 
 	@Override
 	public boolean HandleSubAcquire(HBEpochState state, int verbosity) {
 		VectorClock H_t = state.getVectorClock(state.HBPredecessorThread, this.getThread());
 		VectorClock L_l = state.getVectorClock(state.lastReleaseLock, this.getLock());				
 		H_t.updateWithMax(H_t, L_l);
-		this.printRaceInfo(state,verbosity);
+		this.printRaceInfo(state, verbosity);
 		return false;
 	}
 
@@ -88,7 +92,7 @@ public class HBEpochEvent extends RaceDetectionEvent<HBEpochState> {
 		VectorClock L_l = state.getVectorClock(state.lastReleaseLock, this.getLock());
 		L_l.copyFrom(C_t);
 		state.incClockThread(getThread());
-		this.printRaceInfo(state,verbosity);
+		this.printRaceInfo(state, verbosity);
 		return false;
 	}
 
@@ -103,7 +107,7 @@ public class HBEpochEvent extends RaceDetectionEvent<HBEpochState> {
 
 		if (!(W_v.isLessThanOrEqual(C_t))) {
 			raceDetected = true;
-//			System.out.println("HB race detected on variable " + this.getVariable().getName());
+			//			System.out.println("HB race detected on variable " + this.getVariable().getName());
 		}
 		else{
 			int tIndex = state.getThreadIndex(this.getThread());
@@ -130,22 +134,14 @@ public class HBEpochEvent extends RaceDetectionEvent<HBEpochState> {
 		if (!(R_v.isLessThanOrEqual(C_t))) {
 			raceDetected = true;
 		}
-
-		if(raceDetected){
-//			System.out.println("HB race detected on variable " + this.getVariable().getName());
-		}
-		else{
-			int tIndex = state.getThreadIndex(this.getThread());
-			int c = C_t.getClockIndex(tIndex);
-			if(!W_v.isSameEpoch(c, tIndex)){
-				W_v.setEpoch(c, tIndex);
-				if(!R_v.isEpoch()){
-					R_v.forceBottomEpoch();
-				}
+		int tIndex = state.getThreadIndex(this.getThread());
+		int c = C_t.getClockIndex(tIndex);
+		if(!W_v.isSameEpoch(c, tIndex)){
+			W_v.setEpoch(c, tIndex);
+			if(!R_v.isEpoch()){
+				R_v.forceBottomEpoch();
 			}
 		}
-
-
 		return raceDetected;
 	}
 
@@ -168,26 +164,19 @@ public class HBEpochEvent extends RaceDetectionEvent<HBEpochState> {
 			VectorClock H_t = state.getVectorClock(state.HBPredecessorThread, this.getThread());
 			VectorClock C_tc = state.generateVectorClockFromClockThread(this.getTarget());
 			H_t.updateWithMax(H_t, C_tc);
-			this.printRaceInfo(state,verbosity);
+			this.printRaceInfo(state, verbosity);
 		}
 		return false;
 	}
 
-	@Override
-	public void printRaceInfoTransactionType(HBEpochState state, int verbosity) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public boolean HandleSubBegin(HBEpochState state, int verbosity) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean HandleSubEnd(HBEpochState state, int verbosity) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

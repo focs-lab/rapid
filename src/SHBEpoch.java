@@ -1,10 +1,10 @@
 import cmd.CmdOptions;
 import cmd.GetOptions;
-import engine.racedetectionengine.hb_epoch.HBEpochEngine;
+import engine.racedetectionengine.shb_epoch.SHBEpochEngine;
 
-public class HBEpoch {
+public class SHBEpoch {
 
-	public HBEpoch() {
+	public SHBEpoch() {
 
 	}
 	
@@ -14,14 +14,14 @@ public class HBEpoch {
 		boolean time_reporting = true;
 		long startTimeAnalysis = 0;
 		if(time_reporting){
-			startTimeAnalysis = System.currentTimeMillis();
+			startTimeAnalysis = System.currentTimeMillis(); //System.nanoTime();
 		}
 		
-		HBEpochEngine engine = new HBEpochEngine(options.parserType, options.path);
+		SHBEpochEngine engine = new SHBEpochEngine(options.parserType, options.path);
 		engine.analyzeTrace(options.multipleRace, options.verbosity);
 		
 		if(time_reporting){
-			long stopTimeAnalysis = System.currentTimeMillis();
+			long stopTimeAnalysis = System.currentTimeMillis(); //System.nanoTime();
 			long timeAnalysis = stopTimeAnalysis - startTimeAnalysis;
 			System.out.println("Time for analysis = " + timeAnalysis + " milliseconds");
 		}	

@@ -1,10 +1,10 @@
 import cmd.CmdOptions;
 import cmd.GetOptions;
-import engine.racedetectionengine.hb_epoch.HBEpochEngine;
+import engine.racedetectionengine.shb.SHBEngine;
 
-public class HBEpoch {
+public class SHB {
 
-	public HBEpoch() {
+	public SHB() {
 
 	}
 	
@@ -17,7 +17,7 @@ public class HBEpoch {
 			startTimeAnalysis = System.currentTimeMillis();
 		}
 		
-		HBEpochEngine engine = new HBEpochEngine(options.parserType, options.path);
+		SHBEngine engine = new SHBEngine(options.parserType, options.path);
 		engine.analyzeTrace(options.multipleRace, options.verbosity);
 		
 		if(time_reporting){
