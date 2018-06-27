@@ -51,34 +51,4 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
-    <target name="convertRV2CSV">
-        <java classname="PrintCSV" failonerror="true" fork="yes">
-            <arg line="-p=/Users/umang/Box\ Sync/logs/force_order_files/Nov-5-2016/bin/account -f=rv"/>
-            <classpath refid="rapid.classpath"/>
-        </java>
-    </target>
-    <target name="convertRV2STD">
-        <java classname="PrintSTD" failonerror="true" fork="yes">
-            <arg line="-p=/Users/umang/Box\ Sync/logs/force_order_files/Nov-5-2016/bin/account -f=rv"/>
-            <classpath refid="rapid.classpath"/>
-        </java>
-    </target>
-    <target name="convertCSV2STD">
-        <java classname="PrintSTD" failonerror="true" fork="yes">
-            <arg line="-p=/Users/umang/Desktop/trace.csv -f=csv"/>
-            <classpath refid="rapid.classpath"/>
-        </java>
-    </target>
-    <target name="convertCSV2CSV">
-        <java classname="PrintCSV" failonerror="true" fork="yes">
-            <arg line="-p=/Users/umang/Desktop/trace2.csv -f=csv"/>
-            <classpath refid="rapid.classpath"/>
-        </java>
-    </target>
-    <target name="convertSTD2STD">
-        <java classname="PrintSTD" failonerror="true" fork="yes">
-            <arg line="-p=/Users/umang/Desktop/trace.txt -f=std"/>
-            <classpath refid="rapid.classpath"/>
-        </java>
-    </target>
 </project>

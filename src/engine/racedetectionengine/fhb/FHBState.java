@@ -37,7 +37,7 @@ class IntegerPair {
     
     @Override 
     public String toString(){
-    	return "<" + Integer.toString(this.fst) + "," + Integer.toString(this.snd) + ">";
+    	return "<" + Integer.toString(this.fst) + "|" + Integer.toString(this.snd) + ">";
     }
 
     @Override 
@@ -249,7 +249,6 @@ public class FHBState extends State {
 		}
 		if (raceDetected){
 			this.addLocPair(rLocId, locId);
-			System.out.println(getLocPairs());
 		}	
 		return raceDetected;
 	}

@@ -33,7 +33,7 @@ public class FHBEvent extends RaceDetectionEvent<FHBState> {
 	@Override
 	public void printRaceInfoAccessType(FHBState state, int verbosity) {
 		if(this.getType().isAccessType()){
-			if(verbosity == 1 || verbosity == 2){
+			if(verbosity == 2){
 				String str = "#";
 				str += Integer.toString(getLocId());
 				str += "|";
@@ -106,15 +106,15 @@ public class FHBEvent extends RaceDetectionEvent<FHBState> {
 		this.printRaceInfo(state, verbosity);
 
 		if (!(W_v.isLessThanOrEqual(C_t))) {
-			raceDetected = true;
-			
+			raceDetected = true;			
 			state.addLocPair(state.getLWLocId(this.getVariable()), this.getLocId());
-			System.out.println(state.getLocPairs());
-			
 			//Force order
 			C_t.updateWithMax(C_t, W_v);
 		}
-		
+		if(raceDetected && verbosity > 0){
+			System.out.println(state.getLocPairs());
+		}
+
 		this.printRaceInfo(state, verbosity);
 
 		VectorClock R_v  = state.getVectorClock(state.readVariable, getVariable());
@@ -140,13 +140,15 @@ public class FHBEvent extends RaceDetectionEvent<FHBState> {
 		if(R_v.isLessThanOrEqual(W_v)){
 			if (!(W_v.isLessThanOrEqual(C_t))) {
 				raceDetected = true;
-				
 				state.addLocPair(state.getLWLocId(this.getVariable()), this.getLocId());
-				System.out.println(state.getLocPairs());
 			}
 		}
 		else{
 			raceDetected = state.checkRaceWithReadsAndAddLocPairs(this.getThread(), this.getVariable(), C_t, this.getLocId());
+		}
+		
+		if(raceDetected && verbosity > 0){
+			System.out.println(state.getLocPairs());
 		}
 		
 		C_t.updateWithMax(C_t, W_v, R_v);
@@ -185,13 +187,6 @@ public class FHBEvent extends RaceDetectionEvent<FHBState> {
 		}
 		return false;
 	}
-
-	
-
-
-
-
-
 
 	@Override
 	public boolean HandleSubBegin(FHBState state, int verbosity) {

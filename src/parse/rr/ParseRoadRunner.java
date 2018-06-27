@@ -209,18 +209,4 @@ public class ParseRoadRunner {
 	public int getTotalThreads(){
 		return totThreads;
 	}
-	
-	public static void demo(){
-		String traceFile = "/Users/umang/Desktop/deadlock.rr";
-		Event e = new Event();
-		ParseRoadRunner parser = new ParseRoadRunner(traceFile);
-		while(parser.checkAndGetNext(e)){
-			System.out.println(e.toCompactString());
-		}
-	}
-	
-	public static void main(String args[]){
-		demo();
-	}
-
 }

@@ -23,6 +23,8 @@ public class FHB {
 			long timeAnalysis = stopTimeAnalysis - startTimeAnalysis;
 			System.out.println("Time for analysis = " + timeAnalysis + " milliseconds");
 		}
-		engine.postAnalysis();
+		if(options.verbosity == 1){
+			engine.postAnalysis();
+		}
 	}
 }

@@ -173,19 +173,4 @@ public class ParseStandard {
 	public int getTotalThreads(){
 		return totThreads;
 	}
-	
-	public static void demo(){
-		String traceFile = "/Users/umang/Desktop/trace.txt";
-		Event e = new Event();
-		ParseStandard parser = new ParseStandard(traceFile);
-		while(parser.hasNext()){
-			parser.getNextEvent(e);
-			System.out.println(e.toCompactString());
-		}
-	}
-	
-	public static void main(String args[]){
-		demo();
-	}
-
 }
