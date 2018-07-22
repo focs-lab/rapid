@@ -1,4 +1,4 @@
-## RAPID : Lightweight Framework for Implementing Dynamic Analysis Tools
+## RAPID : Dynamic Analysis for Concurrent Programs
 
 RAPID is a lightweight framework for implementing dynamic race detection engines.
 
