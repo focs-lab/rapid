@@ -51,4 +51,13 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
+    <target name="jar">
+      <jar basedir="bin" destfile="rapid.jar">
+        <manifest>
+          <attribute name="Built-By" value="${builder}" />
+          <attribute name="Built-On" value="${build-info.current-date}" />
+          <attribute name="Built-At" value="${build-info.current-time}" />
+        </manifest>
+      </jar>
+	  </target>
 </project>
