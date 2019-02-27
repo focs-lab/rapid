@@ -10,7 +10,7 @@ RAPID currently implements two race detection engines : HB and [WCP][1].
 ### Trace Formats
 
 RAPID supports three trace formats: RVPredict, CSV, STD. Traces can be read in all the three formats, and can be converted from any of the three formats to either CSV or STD format .
-Recently, I have also added instructions on how to generate traces from RoadRunner. See [here](notes/Generate_RoadRunner_traces.md).
+**Recently, I have also added instructions on how to generate traces from RoadRunner. See [here](notes/Generate_RoadRunner_traces.md).**
 
 #### 1. RVPredict Format
 [RVPredict][2] is a commercial product of [Runtime Verification Inc][3], and performs an SMT based analysis for predicting data races dynamically. RVPredict instruments Java bytecode and is able to perform dynamic analysis on the traces, at runtime. Additionally, it also provides the facility to log the trace generated to perform offline analysis on the logged traces. The developers of RVPredict have kindly shared with us (developers of RAPID) code snippets used to decode these compressed binary traces. As a result,
