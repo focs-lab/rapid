@@ -124,4 +124,4 @@ RAPID supports reading files specified in RVPredict, STD or CSV format. RAPID al
 [6]: https://dl.acm.org/citation.cfm?id=1542490
 [7]: https://dl.acm.org/citation.cfm?id=1250762
 [8]: https://dl.acm.org/citation.cfm?id=265927
-[9]: http://umathur3.web.engr.illinois.edu/papers/shb-oopsla2018.pdf
+[9]: https://dl.acm.org/citation.cfm?id=3276515
