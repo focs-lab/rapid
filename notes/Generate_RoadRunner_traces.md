@@ -6,7 +6,7 @@ This tool is called PrintSubsetTool and the supplied file `PrintSubsetTool.java`
 1. Download RoadRunner tool [here](https://github.com/stephenfreund/RoadRunner).
 Let us say that RoadRunner sits in ${RoadRunnerRoot} directory.
 
-2. Move the file `PrintSubsetTool.java` to the folder ${RoadRunner}/src/rr/simple .
+2. Move the file [`PrintSubsetTool.java`](PrintSubsetTool.java.txt) to the folder ${RoadRunner}/src/rr/simple .
 That's it! RoadRunner is so designed as to automatically take care of all the book-keeping when you write a new tool.
 
 3. Compile Roadrunner as you normally would (see `INSTALL.txt`) in ${RoadRunnerRoot} .
