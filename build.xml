@@ -51,7 +51,7 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
-    <target name="jar" depends="init">
+    <target name="jar" depends="init,build">
       <jar basedir="bin" destfile="rapid.jar">
         <manifest>
           <attribute name="Built-By" value="${builder}" />
