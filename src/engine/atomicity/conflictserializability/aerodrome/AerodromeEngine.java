@@ -1,4 +1,4 @@
-package engine.atomicity.conflictserializability.thb;
+package engine.atomicity.conflictserializability.aerodrome;
 
 import java.util.HashSet;
 
@@ -6,28 +6,23 @@ import engine.atomicity.AtomicityEngine;
 import event.Thread;
 import parse.ParserType;
 
-public class THBEngine extends AtomicityEngine<THBState, THBEvent>{
+public class AerodromeEngine extends AtomicityEngine<AerodromeState, AerodromeEvent>{
 
-	public THBEngine(ParserType pType, String trace_folder, int verbosity) {
+	public AerodromeEngine(ParserType pType, String trace_folder, int verbosity) {
 		super(pType);
 		this.threadSet = new HashSet<Thread> ();
 		initializeReader(trace_folder);
-		this.state = new THBState(this.threadSet, verbosity);
-		handlerEvent = new THBEvent();
+		this.state = new AerodromeState(this.threadSet, verbosity);
+		handlerEvent = new AerodromeEvent();
 	}
 
 	@Override
-	protected boolean skipEvent(THBEvent handlerEvent) {
+	protected boolean skipEvent(AerodromeEvent handlerEvent) {
 		return false;
 	}
 
 	@Override
-	protected void postHandleEvent(THBEvent handlerEvent) {	
-//		if(handlerEvent.getType().isAccessType()){
-//			if(state.verbosity == 1 || state.verbosity == 2){
-//				System.out.println();
-//			}	
-//		}
+	protected void postHandleEvent(AerodromeEvent handlerEvent) {	
 	}
 
 }

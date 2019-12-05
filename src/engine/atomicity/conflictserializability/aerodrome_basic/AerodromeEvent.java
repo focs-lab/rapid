@@ -1,4 +1,4 @@
-package engine.atomicity.conflictserializability.thb_basic;
+package engine.atomicity.conflictserializability.aerodrome_basic;
 
 
 import engine.atomicity.AtomicityEvent;
@@ -7,7 +7,7 @@ import event.Thread;
 import event.Variable;
 import util.vectorclock.VectorClockOpt;
 
-public class THBEvent extends AtomicityEvent<THBState> {
+public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 
 	//	@Override
 	//	public boolean Handle(VCVelodromeState state) {
@@ -15,7 +15,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	//	}
 
 	@Override
-	public void printRaceInfoLockType(THBState state) {
+	public void printRaceInfoLockType(AerodromeState state) {
 		if(this.getType().isLockType()){
 			if(state.verbosity == 2){
 				String str = "#";
@@ -32,7 +32,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public void printRaceInfoTransactionType(THBState state) {
+	public void printRaceInfoTransactionType(AerodromeState state) {
 		if(this.getType().isLockType()){
 			if(state.verbosity == 2){
 				String str = "#";
@@ -49,7 +49,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public void printRaceInfoAccessType(THBState state) {
+	public void printRaceInfoAccessType(AerodromeState state) {
 		if(this.getType().isAccessType()){
 			if(state.verbosity == 1 || state.verbosity == 2){
 				String str = "#";
@@ -68,7 +68,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public void printRaceInfoExtremeType(THBState state) {
+	public void printRaceInfoExtremeType(AerodromeState state) {
 		if(this.getType().isExtremeType()){
 			if(state.verbosity == 2){
 				String str = "#";
@@ -85,7 +85,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubAcquire(THBState state) {
+	public boolean HandleSubAcquire(AerodromeState state) {
 		boolean violationDetected = false;
 		Thread t = this.getThread();
 		Lock l = this.getLock();
@@ -102,7 +102,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubRelease(THBState state) {
+	public boolean HandleSubRelease(AerodromeState state) {
 		Thread t = this.getThread();
 		Lock l = this.getLock();
 		state.checkAndAddLock(l);
@@ -118,7 +118,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubRead(THBState state) {
+	public boolean HandleSubRead(AerodromeState state) {
 		boolean violationDetected = false;	
 		Thread t = this.getThread();
 		Variable v = this.getVariable();
@@ -142,7 +142,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubWrite(THBState state) {
+	public boolean HandleSubWrite(AerodromeState state) {
 		boolean violationDetected = false;
 		Thread t = this.getThread();
 		Variable v = this.getVariable();
@@ -167,7 +167,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubFork(THBState state) {
+	public boolean HandleSubFork(AerodromeState state) {
 		Thread u = this.getTarget();
 		if(state.isThreadRelevant(u)) {
 			Thread t = this.getThread();
@@ -182,7 +182,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubJoin(THBState state) {
+	public boolean HandleSubJoin(AerodromeState state) {
 		Thread u = this.getTarget();
 		if(state.isThreadRelevant(u)) {
 			Thread t = this.getThread();
@@ -193,7 +193,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubBegin(THBState state) {
+	public boolean HandleSubBegin(AerodromeState state) {
 		Thread t = this.getThread();
 		int cur_depth = state.threadToNestingDepth.get(t);
 		state.threadToNestingDepth.put(t,  cur_depth + 1);
@@ -211,7 +211,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubEnd(THBState state) {
+	public boolean HandleSubEnd(AerodromeState state) {
 		Thread t = this.getThread();
 		int cur_depth = state.threadToNestingDepth.get(t);
 		state.threadToNestingDepth.put(t,  cur_depth - 1);

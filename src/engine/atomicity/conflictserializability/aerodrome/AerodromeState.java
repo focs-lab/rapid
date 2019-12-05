@@ -1,4 +1,4 @@
-package engine.atomicity.conflictserializability.thb;
+package engine.atomicity.conflictserializability.aerodrome;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import event.Thread;
 import event.Variable;
 import util.vectorclock.VectorClockOpt;
 
-public class THBState extends State {
+public class AerodromeState extends State {
 
 	// Internal data
 	public HashMap<Thread, Integer> threadToIndex;
@@ -28,25 +28,25 @@ public class THBState extends State {
 	public HashMap<Variable, VectorClockOpt> clockReadVariable; // mathcal{R}
 	public HashMap<Variable, VectorClockOpt> clockReadVariableCheck; // mathcal{chR}
 
-	public HashMap<Lock, Thread> lastThreadToRelease;
-	public HashMap<Variable, Thread> lastThreadToWrite;
+	public HashMap<Lock, Thread> lastThreadToRelease; // lastRelThr
+	public HashMap<Variable, Thread> lastThreadToWrite; // lastWThr
 
 	private HashMap<Thread, Integer> threadToNestingDepth;
 
 	//Optimization data structures
-	public HashMap<Thread, HashSet<Variable>> updateSetThread_write;
-	public HashMap<Thread, HashSet<Variable>> updateSetThread_read;
+	public HashMap<Thread, HashSet<Variable>> updateSetThread_write; // UpdateSet^w
+	public HashMap<Thread, HashSet<Variable>> updateSetThread_read; // UpdateSet^r
+	public HashSet<Variable> staleWrites; // Stale^w
+	public HashMap<Variable, HashSet<Thread>> staleReads; // Stale^r
 
-	public HashMap<Variable, HashSet<Thread>> staleReads;
-	public HashSet<Variable> staleWrites;
-	
+	// Other data-structures to track if parent transaction is alive
 	public HashMap<Thread, HashSet<Thread>> threadsForkedInActiveTransaction;
 	public HashSet<Thread> parentTransactionIsAlive;
 
 	//parameter flags
 	public int verbosity;
 
-	public THBState(HashSet<Thread> tSet, int verbosity) {
+	public AerodromeState(HashSet<Thread> tSet, int verbosity) {
 		this.verbosity = verbosity;
 		initInternalData(tSet);
 		initData(tSet);
@@ -58,7 +58,6 @@ public class THBState extends State {
 		Iterator<Thread> tIter = tSet.iterator();
 		while (tIter.hasNext()) {
 			Thread thread = tIter.next();
-			//System.out.println("Adding thread to map " + thread.toString());
 			this.threadToIndex.put(thread, (Integer)this.numThreads);
 			this.numThreads ++;
 		}
@@ -121,9 +120,6 @@ public class THBState extends State {
 
 	// Access methods
 	private VectorClockOpt getVectorClockFrom1DArray(ArrayList<VectorClockOpt> arr, int index) {
-		//		if (index < 0 || index >= arr.size()) {
-		//			throw new IllegalArgumentException("Illegal Out of Bound access");
-		//		}
 		return arr.get(index);
 	}
 
@@ -139,18 +135,15 @@ public class THBState extends State {
 	}
 
 	public VectorClockOpt getVectorClock(HashMap<Lock, VectorClockOpt> arr, Lock l) {
-		//		checkAndAddLock(l);
 		return arr.get(l);
 	}
 
 	public VectorClockOpt getVectorClock(HashMap<Variable, VectorClockOpt> arr, Variable v) {
-		//		checkAndAddVariable(v);
 		return arr.get(v);
 	}
 
 	public int checkAndAddLock(Lock l){
 		if(!lockToIndex.containsKey(l)){
-			//System.err.println("New lock found " + this.numLocks);
 			lockToIndex.put(l, this.numLocks);
 			this.numLocks ++;
 			this.clockLock.put(l, new VectorClockOpt(this.numThreads));
@@ -183,18 +176,6 @@ public class THBState extends State {
 		int cur_depth = threadToNestingDepth.get(t);
 		threadToNestingDepth.put(t,  cur_depth - 1);
 	}
-
-//	public boolean checkAndGetClock(VectorClockOpt checkClock, VectorClockOpt fromClock, Thread target) {
-//		int tIndex = this.threadToIndex.get(target);
-//		boolean violationDetected = false;
-//		VectorClockOpt C_target_begin = getVectorClock(clockThreadBegin, target);		
-//		if(C_target_begin.isLessThanOrEqual(checkClock, tIndex) && transactionIsActive(target)) {
-//			violationDetected = true;
-//		}
-//		VectorClockOpt C_target = getVectorClock(clockThread, target);
-//		C_target.updateWithMax(C_target, fromClock);
-//		return violationDetected;
-//	}
 	
 	public boolean checkAndGetClock(VectorClockOpt checkClock, VectorClockOpt fromClock, Thread target) {
 		int tIndex = this.threadToIndex.get(target);
@@ -287,7 +268,7 @@ public class THBState extends State {
 		vc1.updateMax2WithoutLocal(vc2, tIndex);
 	}
 
-	// This assumes that local clocks are not increment for events inside a 
+	// This assumes that local clocks are not increment for events inside a transaction
 	public boolean hasIncomingEdge(Thread t) {
 		
 		if(parentTransactionIsAlive.contains(t)) return true;

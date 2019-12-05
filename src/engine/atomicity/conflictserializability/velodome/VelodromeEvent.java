@@ -11,11 +11,6 @@ import util.Transaction;
 
 public class VelodromeEvent extends AtomicityEvent<VelodromeState> {
 
-	//	@Override
-	//	public boolean Handle(VCVelodromeState state) {
-	//		return this.HandleSub(state);
-	//	}
-
 	@Override
 	public void printRaceInfoLockType(VelodromeState state) {
 		if(this.getType().isLockType()){
@@ -231,7 +226,6 @@ public class VelodromeEvent extends AtomicityEvent<VelodromeState> {
 				state.startedThreads.add(t);
 			}
 		}
-//		System.out.println(state.thb_graph.edgeSet());
 		return violationDetected;
 	}
 

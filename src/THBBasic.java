@@ -1,6 +1,6 @@
 import cmd.CmdOptions;
 import cmd.GetOptions;
-import engine.atomicity.conflictserializability.thb_basic.THBEngine;
+import engine.atomicity.conflictserializability.aerodrome_basic.AerodromeEngine;
 
 public class THBBasic {
 
@@ -17,7 +17,7 @@ public class THBBasic {
 			startTimeAnalysis = System.currentTimeMillis(); //System.nanoTime();
 		}
 		
-		THBEngine engine = new THBEngine(options.parserType, options.path, options.verbosity);
+		AerodromeEngine engine = new AerodromeEngine(options.parserType, options.path, options.verbosity);
 		engine.analyzeTrace(false);
 				
 		if(time_reporting){

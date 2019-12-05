@@ -1,4 +1,4 @@
-package engine.atomicity.conflictserializability.thb;
+package engine.atomicity.conflictserializability.aerodrome;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,10 +8,10 @@ import event.Thread;
 import event.Variable;
 import util.vectorclock.VectorClockOpt;
 
-public class THBEvent extends AtomicityEvent<THBState> {
+public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 
 	@Override
-	public void printRaceInfoLockType(THBState state) {
+	public void printRaceInfoLockType(AerodromeState state) {
 		if(this.getType().isLockType()){
 			if(state.verbosity == 2){
 				String str = "#";
@@ -28,7 +28,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public void printRaceInfoTransactionType(THBState state) {
+	public void printRaceInfoTransactionType(AerodromeState state) {
 		if(this.getType().isLockType()){
 			if(state.verbosity == 2){
 				String str = "#";
@@ -45,7 +45,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public void printRaceInfoAccessType(THBState state) {
+	public void printRaceInfoAccessType(AerodromeState state) {
 		if(this.getType().isAccessType()){
 			if(state.verbosity == 1 || state.verbosity == 2){
 				String str = "#";
@@ -64,7 +64,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public void printRaceInfoExtremeType(THBState state) {
+	public void printRaceInfoExtremeType(AerodromeState state) {
 		if(this.getType().isExtremeType()){
 			if(state.verbosity == 2){
 				String str = "#";
@@ -81,22 +81,26 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubAcquire(THBState state) {
+	public boolean HandleSubAcquire(AerodromeState state) {
 		boolean violationDetected = false;
 		Thread t = this.getThread();
 		Lock l = this.getLock();
 		state.checkAndAddLock(l);
 		VectorClockOpt L_l = state.getVectorClock(state.clockLock, l);
+		
 		if(state.lastThreadToRelease.containsKey(l)) {
 			if(!state.lastThreadToRelease.get(l).equals(t)) {
 				violationDetected = state.checkAndGetClock(L_l, L_l, t);
 			}
 		}
+		
+		// No need to increment local clock because it is not sent to other threads.
+		
 		return violationDetected;
 	}
 
 	@Override
-	public boolean HandleSubRelease(THBState state) {
+	public boolean HandleSubRelease(AerodromeState state) {
 		Thread t = this.getThread();
 		Lock l = this.getLock();
 		state.checkAndAddLock(l);
@@ -114,7 +118,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubRead(THBState state) {
+	public boolean HandleSubRead(AerodromeState state) {
 
 		boolean violationDetected = false;	
 		Thread t = this.getThread();
@@ -147,7 +151,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubWrite(THBState state) {
+	public boolean HandleSubWrite(AerodromeState state) {
 		boolean violationDetected = false;
 		Thread t = this.getThread();
 		Variable v = this.getVariable();
@@ -188,7 +192,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubFork(THBState state) {
+	public boolean HandleSubFork(AerodromeState state) {
 		Thread u = this.getTarget();
 		if(state.isThreadRelevant(u)) {
 			Thread t = this.getThread();
@@ -210,7 +214,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubJoin(THBState state) {
+	public boolean HandleSubJoin(AerodromeState state) {
 		Thread u = this.getTarget();
 		if(state.isThreadRelevant(u)) {
 			Thread t = this.getThread();
@@ -218,10 +222,12 @@ public class THBEvent extends AtomicityEvent<THBState> {
 			return state.checkAndGetClock(C_u, C_u, t);
 		}
 		else return false;
+		
+		// No need to increment local clock as it is not sent out.
 	}
 
 	@Override
-	public boolean HandleSubBegin(THBState state) {
+	public boolean HandleSubBegin(AerodromeState state) {
 		Thread t = this.getThread();
 		boolean violationDetected = false;
 
@@ -238,7 +244,7 @@ public class THBEvent extends AtomicityEvent<THBState> {
 	}
 
 	@Override
-	public boolean HandleSubEnd(THBState state) {
+	public boolean HandleSubEnd(AerodromeState state) {
 		Thread t = this.getThread();
 		boolean violationDetected = false;
 
@@ -246,7 +252,6 @@ public class THBEvent extends AtomicityEvent<THBState> {
 		if(!state.transactionIsActive(t)) {
 			if(state.hasIncomingEdge(t)) {
 				violationDetected = state.handshakeAtEndEvent_Optimized(t);
-//				state.incClockThread(t);
 			}
 			else {
 				for(Variable v: state.updateSetThread_read.get(t)) {

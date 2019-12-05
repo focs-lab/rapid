@@ -30,7 +30,6 @@ public class VelodromeState extends State {
 	private int transaction_ctr;
 	private static Transaction bottom_transaction = new Transaction();
 	
-//	public HashMap<Thread, Stack<Integer>> transactionStackThread; // t -> Stack(transaction_id)
 	public HashMap<Thread, Transaction> threadToCurrentTransaction; // mathcal{C}
 	public HashMap<Thread, Transaction> threadToLastOpTransaction;// mathcal{L}
 	public HashMap<Lock, Transaction> lockToLastReleaseTransaction;// mathcal{U}
@@ -59,7 +58,6 @@ public class VelodromeState extends State {
 		Iterator<Thread> tIter = tSet.iterator();
 		while (tIter.hasNext()) {
 			Thread thread = tIter.next();
-			//System.out.println("Adding thread to map " + thread.toString());
 			this.threadToIndex.put(thread, (Integer)this.numThreads);
 			this.numThreads ++;
 		}
@@ -119,7 +117,6 @@ public class VelodromeState extends State {
 	
 	public int checkAndAddLock(Lock l){
 		if(!lockToIndex.containsKey(l)){
-			//System.err.println("New lock found " + this.numLocks);
 			lockToIndex.put(l, this.numLocks);
 			this.numLocks ++;
 			this.lockToLastReleaseTransaction.put(l, bottom_transaction);
@@ -170,7 +167,6 @@ public class VelodromeState extends State {
 		}
 		
 		if(no_incoming_edge) {
-//			System.out.println("Garbage collecting transaction <" + n.thread + ", " + n.id + ">");
 			for(Thread t: this.threadToLastOpTransaction.keySet()) {
 				if(this.threadToLastOpTransaction.get(t).equals(n)) {
 					this.threadToLastOpTransaction.put(t,  this.getBottomTransaction());

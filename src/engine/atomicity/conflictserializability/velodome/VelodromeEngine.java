@@ -23,11 +23,6 @@ public class VelodromeEngine extends AtomicityEngine<VelodromeState, VelodromeEv
 
 	@Override
 	protected void postHandleEvent(VelodromeEvent handlerEvent) {	
-//		if(handlerEvent.getType().isAccessType()){
-//			if(state.verbosity == 1 || state.verbosity == 2){
-//				System.out.println();
-//			}	
-//		}
 	}
 
 	public int numTransactionsActive() {

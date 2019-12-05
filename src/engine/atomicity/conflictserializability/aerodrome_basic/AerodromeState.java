@@ -1,4 +1,4 @@
-package engine.atomicity.conflictserializability.thb_basic;
+package engine.atomicity.conflictserializability.aerodrome_basic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import event.Thread;
 import event.Variable;
 import util.vectorclock.VectorClockOpt;
 
-public class THBState extends State {
+public class AerodromeState extends State {
 
 	// Internal data
 	public HashMap<Thread, Integer> threadToIndex;
@@ -28,15 +28,15 @@ public class THBState extends State {
 	public HashMap<Variable, VectorClockOpt> clockReadVariable; // mathcal{R}
 	public HashMap<Variable, VectorClockOpt> clockReadVariableCheck; // mathcal{chR}
 
-	public HashMap<Lock, Thread> lastThreadToRelease;
-	public HashMap<Variable, Thread> lastThreadToWrite;
+	public HashMap<Lock, Thread> lastThreadToRelease; // lastRelThr
+	public HashMap<Variable, Thread> lastThreadToWrite; // lastWThr
 
 	public HashMap<Thread, Integer> threadToNestingDepth;
 
 	//parameter flags
 	public int verbosity;
 
-	public THBState(HashSet<Thread> tSet, int verbosity) {
+	public AerodromeState(HashSet<Thread> tSet, int verbosity) {
 		this.verbosity = verbosity;
 		initInternalData(tSet);
 		initData(tSet);
@@ -48,7 +48,6 @@ public class THBState extends State {
 		Iterator<Thread> tIter = tSet.iterator();
 		while (tIter.hasNext()) {
 			Thread thread = tIter.next();
-			//System.out.println("Adding thread to map " + thread.toString());
 			this.threadToIndex.put(thread, (Integer)this.numThreads);
 			this.numThreads ++;
 		}
@@ -95,9 +94,6 @@ public class THBState extends State {
 
 	// Access methods
 	private VectorClockOpt getVectorClockFrom1DArray(ArrayList<VectorClockOpt> arr, int index) {
-//		if (index < 0 || index >= arr.size()) {
-//			throw new IllegalArgumentException("Illegal Out of Bound access");
-//		}
 		return arr.get(index);
 	}
 
@@ -113,18 +109,15 @@ public class THBState extends State {
 	}
 
 	public VectorClockOpt getVectorClock(HashMap<Lock, VectorClockOpt> arr, Lock l) {
-//		checkAndAddLock(l);
 		return arr.get(l);
 	}
 
 	public VectorClockOpt getVectorClock(HashMap<Variable, VectorClockOpt> arr, Variable v) {
-//		checkAndAddVariable(v);
 		return arr.get(v);
 	}
 
 	public int checkAndAddLock(Lock l){
 		if(!lockToIndex.containsKey(l)){
-			//System.err.println("New lock found " + this.numLocks);
 			lockToIndex.put(l, this.numLocks);
 			this.numLocks ++;
 			this.clockLock.put(l, new VectorClockOpt(this.numThreads));
