@@ -1,7 +1,6 @@
 package engine.print;
-import java.util.HashMap;
-import java.util.HashSet;
 
+import java.util.HashMap;
 import engine.Engine;
 import engine.accesstimes.AccessTimesEngine;
 import event.Event;
@@ -20,9 +19,6 @@ public class PrintFilterEngine extends Engine<Event> {
 	int currentThreadIdx;
 	HashMap<Thread, Integer> tIndexMap;
 	static HashMap<EventType, String> type2String;
-	
-	private HashMap<String, HashSet<String>> variableToThreadSet;
-	private HashMap<String, HashSet<String>> lockToThreadSet;
 
 	private static void initType2String(){
 		type2String = new  HashMap<EventType, String> ();
@@ -54,9 +50,6 @@ public class PrintFilterEngine extends Engine<Event> {
 			long timeAnalysis = stopTimeAnalysis - startTimeAnalysis;
 			System.out.println("Time for Phase-1 = " + timeAnalysis + " milliseconds");	
 		}
-	
-		this.variableToThreadSet = accessTimesEngine.variableToThreadSet;
-		this.lockToThreadSet = accessTimesEngine.lockToThreadSet;
 	}
 
 	public void analyzeTrace(ParserType outputType) {
