@@ -2,10 +2,8 @@
 
 RAPID is a lightweight framework for implementing dynamic race detection engines.
 
-RAPID uses [RVPredict][2]'s instrumentation
-mechanism for logging program executions (_traces_). On top of this, RAPID provides functionality for reading these traces. RAPID also supports two more trace formats: CSV and STD, described below.
-
-RAPID currently implements two race detection engines : HB and [WCP][1].
+For the sake of simplicity, RAPID does not support its own logging mehanism but can leverage instrumentation of external tools ---  [RVPredict][2] or [RoadRunner][12] --- for logging program executions (_traces_). 
+On top of this, RAPID provides functionality for reading these traces. RAPID also supports two more trace formats: CSV and STD, described below.
 
 ### Trace Formats
 
@@ -123,7 +121,7 @@ The above packages also give a fair idea on how to write your favorite dynamic a
 
 ### Conversion across Trace Formats
 
-RAPID supports reading files specified in RVPredict, STD or CSV format. RAPID also allows printing a given trace into either STD or CSV format.
+RAPID supports reading files specified in RoadRunner, STD, RVPredict or CSV format. RAPID also allows printing a given trace into either STD or CSV format.
 
 [1]: https://dl.acm.org/citation.cfm?id=3062374
 [2]: https://runtimeverification.com/predict/
@@ -136,3 +134,4 @@ RAPID supports reading files specified in RVPredict, STD or CSV format. RAPID al
 [9]: https://dl.acm.org/citation.cfm?id=3276515
 [10]: https://dl.acm.org/citation.cfm?id=1375618
 [11]: http://umathur3.web.engr.illinois.edu/papers/aerodrome-asplos20.pdf
+[12]: https://github.com/stephenfreund/RoadRunner/
