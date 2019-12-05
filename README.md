@@ -104,14 +104,16 @@ So far, the focus has not been on performance optimality.
 **Engine** - The main interesting class that RAPID implements is the `Engine` class.
 `Engine` is an abstract class, and can be inherited to implement different dynamic analysis engines. 
 The current distribution includes the following race detection engines :
-1. [DJIT+][5] style HB race detection (see `engine.racedetectionengine.hb`)
-2. HB race detection with [FastTrack][6] style epoch optimizations (see `engine.racedetectionengine.hb_epoch`)
-3. HB race detection using [Goldilocks][7] algorithm (see `engine.racedetectionengine.goldilocks`)
-4. [Eraser's algorithm][8] for violation of lockset principle (see `engine.racedetectionengine.lockset`)
-5. DJIT+ style HB race detection which [forces an order between each race detected][9] (see `engine.racedetectionengine.fhb`) 
-6. Race Detection using the [SHB][9] partial order (see `engine.racedetectionengine.shb`)
-7. Race Detection using the [SHB][9] partial order with epoch optimization (see `engine.racedetectionengine.shb_epoch`)
-8. Race Detection using [WCP][1] partial order (`engine.racedetectionengine.wcp`)
+1. [DJIT+][5] style HB race detection (see [`engine.racedetectionengine.hb`](src/engine/racedetectionengine/hb))
+2. HB race detection with [FastTrack][6] style epoch optimizations (see [`engine.racedetectionengine.hb_epoch`](src/engine/racedetectionengine/hb_epoch))
+3. HB race detection using [Goldilocks][7] algorithm (see [`engine.racedetectionengine.goldilocks`](src/engine/racedetectionengine/goldilocks))
+4. [Eraser's algorithm][8] for violation of lockset principle (see [`engine.racedetectionengine.lockset`](src/engine/racedetectionengine/lockset))
+5. DJIT+ style HB race detection which [forces an order between each race detected][9] (see [`engine.racedetectionengine.fhb`](src/engine/racedetectionengine/fhb)) 
+6. Race Detection using the [SHB][9] partial order (see [`engine.racedetectionengine.shb`](src/engine/racedetectionengine/shb))
+7. Race detection using the [SHB][9] partial order with epoch optimization (see [`engine.racedetectionengine.shb_epoch`](src/engine/racedetectionengine/shb_epoch))
+8. Race detection using [WCP][1] partial order ([`engine.racedetectionengine.wcp`](src/engine/racedetectionengine/wcp))
+9. [Velodrome][10] algorithm for detecting atomicity violations (see [`engine.atomicity.conflictserializability.velodrome`](src/engine/atomicity/conflictserializability/velodome))
+10. [Aerodrome][11] algorithm for detecting atomicity violations (see [`engine.atomicity.conflictserializability.aerodrome_basic`](src/engine/atomicity/conflictserializability/aerodrome_basic) for the basic algorithm and [`engine.atomicity.conflictserializability.aerodrome`](src/engine/atomicity/conflictserializability/aerodrome/) for Aerodrome with optimizations)
 
 The above packages also give a fair idea on how to write your favorite dynamic analysis engine in RAPID.
 
@@ -132,3 +134,5 @@ RAPID supports reading files specified in RVPredict, STD or CSV format. RAPID al
 [7]: https://dl.acm.org/citation.cfm?id=1250762
 [8]: https://dl.acm.org/citation.cfm?id=265927
 [9]: https://dl.acm.org/citation.cfm?id=3276515
+[10]: https://dl.acm.org/citation.cfm?id=1375618
+[11]: http://umathur3.web.engr.illinois.edu/papers/aerodrome-asplos20.pdf
