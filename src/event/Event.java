@@ -260,6 +260,22 @@ public class Event {
 		return "@  Acquire(T" + Integer.toString(this.getThread().getId()) + ",L"
 				+ Integer.toString(this.getLock().getId()) + ")";
 	}
+	
+	public String toStandardFormat(){
+		String sensibleStr = this.getThread().getName();
+		sensibleStr = sensibleStr + "|" + this.getType().toStandardFormat();
+		if(this.getType().isAccessType()){
+			sensibleStr = sensibleStr + "(" + this.getVariable().getName() + ")"; 
+		}
+		else if(this.getType().isLockType()){
+			sensibleStr = sensibleStr + "(" + this.getLock().getName() + ")"; 
+		}
+		else if(this.getType().isExtremeType()){
+			sensibleStr = sensibleStr + "(" + this.getTarget().getName() + ")"; 
+		}
+		sensibleStr = sensibleStr + "|" + this.getLocId();
+		return sensibleStr;
+	}
 	/************************************************/
 	
 	/****************Read/Write**********************/

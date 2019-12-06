@@ -71,4 +71,17 @@ public enum EventType {
 		if(this.isEnd()) str = "END";
 		return str;
 	}
+	
+	public String toStandardFormat(){
+		String str = "";
+		if(this.isAcquire()) str = "acq";
+		if(this.isRelease()) str = "rel";
+		if(this.isRead()) str = "r";
+		if(this.isWrite()) str = "w";
+		if(this.isFork()) str = "fork";
+		if(this.isJoin()) str = "join";
+		if(this.isBegin()) str = "begin";
+		if(this.isEnd()) str = "end";
+		return str;
+	}
 }

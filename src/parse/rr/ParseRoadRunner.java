@@ -18,6 +18,7 @@ public class ParseRoadRunner {
 	private HashMap<String, Thread> threadMap;
 	private HashMap<String, Lock> lockMap;
 	private HashMap<String, Variable> variableMap;
+	
 	int totThreads;
 	BufferedReader bufferedReader;
 	String line;
@@ -27,7 +28,8 @@ public class ParseRoadRunner {
 	
 	private int locIdIndex;
 	public HashMap<String, Integer> locationToIdMap;
-
+	public HashSet<String> excludedPatterns;
+	
 	public ParseRoadRunner(String traceFile){
 		threadMap = new HashMap<String, Thread>();
 		lockMap = new HashMap<String, Lock>();
@@ -45,18 +47,49 @@ public class ParseRoadRunner {
 		catch (FileNotFoundException ex) {
 			System.out.println("Unable to open file '" + traceFile + "'");
 		}
-
+		
+		excludedPatterns = new HashSet<String> ();
+		
 		parser = new Parse();
 		eInfo = new EventInfo();
 		line = null;
 	}
-	
-	public ParseRoadRunner(String traceFile, boolean computeThreadSetAPriori){
+
+	public ParseRoadRunner(String traceFile, String excludeFile){
 		this(traceFile);
+		String exclude_pattern;
+		try {
+			BufferedReader excludeFileBuffer = new BufferedReader(new FileReader(excludeFile));
+			while(true) {
+				try {
+					exclude_pattern = excludeFileBuffer.readLine();
+				}
+				catch (IOException ioe) {
+					System.err.println("Error occured when reading '" + excludeFile + "'");
+					break;
+				}
+				boolean endOfFile = (exclude_pattern == null);
+				if(endOfFile){
+					try {
+						excludeFileBuffer.close();
+					} catch (IOException e) {
+						System.err.println("Error closing buffered reader");
+					}
+					break;
+				}
+				excludedPatterns.add(exclude_pattern);
+			}
+		}
+		catch (FileNotFoundException ex) {
+			System.out.println("Unable to open file '" + excludeFile + "'");
+		}
+	}
+	
+	private void computeThreadsAndResetState(String traceFile, boolean computeThreadSetAPriori) {
 		if(computeThreadSetAPriori){
 			Event e = new Event ();
 			while(this.checkAndGetNext(e)){} //Read this trace to calculate threadSet
-			this.totEvents = 0; //Reset total number of events. This is needed so that AuxId is set correctly.
+			this.totEvents = 0; //Resetting totEvents is required to ensure correct AuxId
 			try{
 				bufferedReader = new BufferedReader(new FileReader(traceFile));
 			}
@@ -64,6 +97,16 @@ public class ParseRoadRunner {
 				System.out.println("Unable to open file '" + traceFile + "'");
 			}
 		}
+	}
+	
+	public ParseRoadRunner(String traceFile, boolean computeThreadSetAPriori){
+		this(traceFile);
+		computeThreadsAndResetState(traceFile, computeThreadSetAPriori);
+	}
+	
+	public ParseRoadRunner(String traceFile, String excludeFile, boolean computeThreadSetAPriori){
+		this(traceFile, excludeFile);
+		computeThreadsAndResetState(traceFile, computeThreadSetAPriori);
 	}
 	
 	public HashSet<Thread> getThreadSet(){
@@ -165,7 +208,7 @@ public class ParseRoadRunner {
 		try {
 			parser.getInfo(eInfo, line);
 		} catch (CannotParseException ex) {
-			System.err.println("Canot parse line -> " + line);
+			System.err.println("Cannot parse line -> " + line);
 		}
 		eInfo2Event(e);
 	}
@@ -194,8 +237,22 @@ public class ParseRoadRunner {
 		boolean validEvent = false;
 		while(!EOF){
 			try {
-				parser.getInfo(eInfo, line);
-				validEvent = true;
+				boolean shouldExclude = false;
+				for(String pattern: this.excludedPatterns) {
+					if(line.contains(pattern)) {
+						if(line.contains("Enter(") || line.contains("Exit(")) {
+							shouldExclude = true;
+							break;
+						}
+					}
+				}
+				if(!shouldExclude) {
+					parser.getInfo(eInfo, line);
+					validEvent = true;
+				}
+//				else {
+//					System.out.println("Skipping line " + line);
+//				}
 			} catch (CannotParseException ex) {}
 			if(validEvent) break;
 			else{
@@ -209,4 +266,24 @@ public class ParseRoadRunner {
 	public int getTotalThreads(){
 		return totThreads;
 	}
+	
+	public static void demo(){
+		String traceFile = "/Users/umang/Repositories/rapid-internal/traces/atomicity_tests/sunflow.rr";
+		String excludeFile = "/Users/umang/Repositories/doublechecker-single-run/avd/at_spec/sunflow.txt";
+		Event e = new Event();
+		ParseRoadRunner parser = new ParseRoadRunner(traceFile, excludeFile);
+		for(String s: parser.excludedPatterns) {
+			System.out.println(s);
+		}
+		while(parser.checkAndGetNext(e)){
+			System.out.println(e.toCompactString());
+		}
+//		System.out.println(parser.locationToIdMap);
+		
+	}
+	
+	public static void main(String args[]){
+		demo();
+	}
+
 }

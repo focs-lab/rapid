@@ -25,6 +25,7 @@ public class GetOptions {
 		options.addOption("s", "single", false, "force the algorithm to terminate after the first race is detected");
 		options.addOption("p", "path", true, "the path to the trace file/folder (Required)");
 		options.addOption("v", "verbosity", true, "for setting verbosity: Allowed levels = 0, 1, 2 (Default : 0)");
+        options.addOption("m", "excluded-methods", true, "path to file that lists methods to be excluded");
 	}
 
 	public CmdOptions parse() {
@@ -64,6 +65,10 @@ public class GetOptions {
 				log.log(Level.INFO, "MIssing path to file/folder");
 				help();
 			}
+			
+            if (cmd.hasOption("m")) {
+                cmdOpt.excludeList = cmd.getOptionValue("m") ;   
+            }
 
 		} catch (ParseException e) {
 			help();

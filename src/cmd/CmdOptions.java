@@ -9,6 +9,7 @@ public class CmdOptions {
 	public boolean multipleRace;
 	public String path;
 	public int verbosity;
+	public String excludeList;
 
 	public CmdOptions() {
 		this.parserType = ParserType.CSV;
@@ -16,6 +17,7 @@ public class CmdOptions {
 		this.multipleRace = true;
 		this.path = null;
 		this.verbosity = 0;
+		this.excludeList = null;
 	}
 	
 	public String toString(){
@@ -25,6 +27,7 @@ public class CmdOptions {
 		str += "multipleRace	" + " = " + this.multipleRace			+ "\n";	
 		str += "path			" + " = " + this.path					+ "\n";
 		str += "verbosity		" + " = " + this.verbosity				+ "\n";
+		str += "excludeList		" + " = " + this.excludeList			+ "\n";
 		return str;
 	}
 
