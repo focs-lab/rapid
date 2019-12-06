@@ -2,9 +2,9 @@ import cmd.CmdOptions;
 import cmd.GetOptions;
 import engine.atomicity.conflictserializability.aerodrome.AerodromeEngine;
 
-public class THB {
+public class Aerodrome {
 
-	public THB() {
+	public Aerodrome() {
 
 	}
 	
