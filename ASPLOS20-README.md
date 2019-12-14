@@ -154,3 +154,62 @@ This step generates the following files either for particular benchmark or for a
 	- `$AE_HOME/benchmarks/<benchmark_name>/aerodrome.err`
 	- `$AE_HOME/benchmarks/<benchmark_name>/aerodrome.tim`
 
+The file `aerodrome.err` should ideally be empty. If it is not empty, it contains error information from the Java command run in the python script `aerodrome.py`.
+
+The file `aerodrome.txt` contains the actual output.
+An example is below:
+```
+2
+Analysis complete
+Number of events analyzed = 6176
+Number of violations found = 1
+Time for full analysis = 65 milliseconds
+```
+The last three lines are the most important lines. 
+The last line reports the total time taken.
+The penultimate line denotes if a violation is found. If there is no violation, it says `Number of violations found = 0`.
+The 3rd last line indicates the total number of events analyzed before the violation was reported (or all events if no violation was reported).
+The other lines are for debugging purposes.
+
+The file `aerodrome.tim` reports the time taken.
+
+## Running Velodrome
+
+If you want to analyze the trace for a single benchmark:
+```
+python velodrome.py <benchmark_name>
+```
+Here, `<benchmark_name>` could be something like `philo`.
+
+Alternatively, if you have generated `trace.rr` for all benchmarks, you could analyze the traces for all benchmarks as follows.
+```
+python velodrome.py
+```
+
+This step generates the following files either for particular benchmark or for all benchmarks depending upon which of the above two commands you ran:
+	- `$AE_HOME/benchmarks/<benchmark_name>/velodrome.txt`
+	- `$AE_HOME/benchmarks/<benchmark_name>/velodrome.err`
+	- `$AE_HOME/benchmarks/<benchmark_name>/velodrome.tim`
+
+The file `velodrome.err` should ideally be empty. If it is not empty, it contains error information from the Java command run in the python script `aerodrome.py`.
+
+The file `velodrome.txt` contains the actual output.
+An example is below:
+```
+2
+Analysis complete
+Number of events analyzed = 6176
+Number of violations found = 1
+Number of transactions remaining = 5
+Time for full analysis = 61 milliseconds
+```
+The last four lines are the most important lines. 
+The last line reports the total time taken.
+The 2nd last line denotes the number of transactions remaining in the transaction graph of Velodrome's analysis at the time the analysis ended.
+The 3rd last line denotes if a violation is found. If there is no violation, it says `Number of violations found = 0`.
+The 4th last line indicates the total number of events analyzed before the violation was reported (or all events if no violation was reported).
+The other lines are for debugging purposes.
+
+The file `velodrome.tim` reports the time taken.
+
+
