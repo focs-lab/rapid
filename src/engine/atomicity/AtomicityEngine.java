@@ -58,9 +58,9 @@ public abstract class AtomicityEngine<St extends State, RDE extends AtomicityEve
 			System.out.println("|"+Long.toString(eventCount));
 		}
 
-		if (violationDetected) {
-			System.out.println(handlerEvent.getLocId());
-		}
+//		if (violationDetected) {
+//			System.out.println(handlerEvent.getLocId());
+//		}
 		return violationDetected;
 	}
 
@@ -82,8 +82,13 @@ public abstract class AtomicityEngine<St extends State, RDE extends AtomicityEve
 		}
 
 		System.out.println("Analysis complete");
+		if(violationCount > 0) {
+			System.out.println("Atomicity violation detected");
+		}
+		else {
+			System.out.println("No atomicity violation detected");
+		}
 		System.out.println("Number of events analyzed = " + Long.toString(eventCount));
-		System.out.println("Number of violations found = " + Long.toString(violationCount));
 	}
 
 	protected void analyzeTraceCSV(boolean multipleRace) {
