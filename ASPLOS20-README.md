@@ -1,47 +1,67 @@
+
 ## Overview
 
-We presented an implementation for the algorithm presented in our ASPLOS'20 paper.
-The algorithm (Aerodrome) analyzes executions of concurrent programs and detects violations of conflict serializability.
-We also compare against the former state-of-the-art algorithm Velodrome.
+**Paper** : Atomicity Checking in Linear Time using Vector Clocks, ASPLOS'20
+**Artifact Outline** - In the above ASPLOS'20 paper, we present an algorithm *AeroDrome* for checking atomicity violations dynamically. We implemented AeroDrome in our tool [RAPID]([https://github.com/umangm/rapid](https://github.com/umangm/rapid))  and evaluate its performance on benchmark programs. We also compare against previous algorithm [Velodrome](https://dl.acm.org/citation.cfm?id=1375618) which has also been implemented in RAPID.
+Here we describe how to run AeroDrome and Velodrome to reproduce results from our paper.
 
 ## Requirements
 
-1. Machine with Unix based operating system, such as Ubuntu or MacOS.
-2. Java 1.8 
+1. Machine with Unix based operating system, such as Ubuntu or MacOS. Our experiments were performed on a  machine with about 30GB RAM. Our experiments work even with less RAM but the performance might differ.
+2. Java 1.8 or higher
 3. Apache Ant
 4. Python 2.7 or higher
+
+## Directory Structure
+
+```
+Paper576-AE
+|--- README.md
+|--- atomicity_specs/
+|--- benchmarks/
+|--- scripts/
+```
 
 ## Overall Workflow
 
 Our benchmarks are provided in the directory `benchmarks/`.
 The overall workflow is pretty simple - 
 
-1. We first need to generate execution logs. 
-We will use [RoadRunner](https://github.com/stephenfreund/RoadRunner) for this.
+1. **Trace Generation** - We first need to generate execution logs. We will use [RoadRunner](https://github.com/stephenfreund/RoadRunner) for this.
 For each benchmark, we will generate a file called `full_trace.rr` using RoadRunner.
+Each log is a sequence of *events*. Each event has the form `e = <t, op>`. Here,  `t` denotes the thread that performed `e` and `op` denotes the operation that was performed in the event `e`. The operation  `op` can be  read or write of a variable `x` (`r(x)` or `w(x)`), acquire or release of a lock `l` (`acq(l)` or `rel(l)`), fork or join of another thread `u` (`fork(u)` or `join(u)`), or `begin`/`end` events denoting the start or completion of a *transaction*. These transaction boundary events arise at method entry and exit points.
+We will use our script `scripts/gen_trace.py` to generate one trace log `benchmarks/{b}/full_trace.rr` for every benchmark `b`. These files are in the format we call the `rr` format (short for RoadRunner format). This format is readable in a txt editor.
 
-2. We will then account for externally provided atomicity specifications. 
-For this we basically need to modify these execution logs by removing certain events.
-The directory `atomicity_specs/` contains a `.txt` file for each benchmark.
-This file contains hints for which events to be removed from `full_trace.rr` corresponding to the benchmark. 
-The resulting execution log will be called `trace.rr`.
+2. **Accounting for Atomicity Specifications** - We will then account for externally provided atomicity specifications. We have curated atomicity specifications (either collecting them from previous works or creating simpler ones ourselves). 
+For every benchmark `b`, we have a file `b.txt`  in the directory`atomicity_specs/` containing a list of methods; these are methods that should be discounted when accounting for transactions. Hence, we remove the transaction `begin` and `end` events corresponding to these methods.
+We will use our script `scripts/atom_spec.py` to generate the modified trace log `benchmarks/{b}/trace.std` for every benchmark `b`.  The script `scripts/atom_spec.py` runs the class `ExcludeMethods` in RAPID.
+These modified trace log files are in a format we call the `std` (short for Standard) format. [Here]([https://github.com/umangm/rapid#1-std-standard-format](https://github.com/umangm/rapid#1-std-standard-format)) is a description of this format.
 
-3. We then analyze the modified execution logs `trace.rr`.
-For this, we need our tool [RAPID](https://github.com/umangm/rapid/).
-Rapid can give several kinds of information about an execution log:
-	- The class `MetaInfo` in RAPID can be used to determine basic information about the log, including the total number of events, threads, variables, locks etc.
-	- The 'Aerodrome' in RAPID determines conflict serializability violations using our proposed algorithm Aerodrome.
-	- The 'Velodrome' in RAPID determines conflict serializability violations using the prior state-of-the-art algorithm Velodrome.
+**Remark** - Both steps 1. and 2. above use up a lot of RAM and take a lot of time. The files used in the experiments at the time of submitting the paper can be obtained form this link: [https://tinyurl.com/asplos20-aerodrome-traces](https://tinyurl.com/asplos20-aerodrome-traces). 
 
-**Remark** - 
-In the following we will assume that the directory in which this file is located is stored in the environment variables $AE_HOME.
-For example, if your directory is `/path/to/asplos-ae/`, then you would execute:
+3. **Analyses** - We then analyze the modified execution logs `trace.std`.
+For this, we need our tool [RAPID](https://github.com/umangm/rapid/). RAPID can perform several kinds of analyses on an execution log - 
+	- The class [`MetaInfo`]([https://github.com/umangm/rapid/blob/master/src/MetaInfo.java](https://github.com/umangm/rapid/blob/master/src/MetaInfo.java))  in RAPID can be used to determine basic information about the log, including the total number of events, threads, variables, locks etc.
+	- The [`Aerodrome`]([https://github.com/umangm/rapid/blob/master/src/Aerodrome.java](https://github.com/umangm/rapid/blob/master/src/Aerodrome.java)) in RAPID determines atomicity violations using our proposed algorithm Aerodrome.
+	- The [`Velodrome`]([https://github.com/umangm/rapid/blob/master/src/Velodrome.java](https://github.com/umangm/rapid/blob/master/src/Velodrome.java)) in RAPID determines atomicity violations using the prior state-of-the-art algorithm Velodrome.
+
+**Remark** - In the following we will assume that the directory in which this `README` file is located is stored in the environment variables $AE_HOME.
+For example, if your directory is `/path/to/Paper576-AE/`, then you would execute:
 ```
 export AE_HOME=/path/to/asplos-ae
 ```
 Also, you need to change the variable `home` in the file `scripts/util.py` (line 17) to be the value of $AE_HOME .
 
-## Generating traces and Accounting for Atomicity Specifications
+## Steps 1 & 2: Generating traces and Accounting for Atomicity Specifications
+
+**Warning** - This step will take up a lot of time. Readers interested in simply reproducing the results form the paper can download the traces used in our paper from the following link and move to Step-3 directly.
+Link: [https://tinyurl.com/asplos20-aerodrome-traces](https://tinyurl.com/asplos20-aerodrome-traces). 
+Once you download traces directly from the above link, make sure to delete the original `benchmarks/` folder completely and replace it with the downloaded folder : 
+```
+rm -rf $AE_HOME/benchmarks/ #Alternatively you may want to rename this folder to $AE_HOME/backup_benchmarks/
+unzip /path/to/downloaded/zip -d $AE_HOME/ #It extracts to a folder called asplos20-ae-traces
+mv $AE_HOME/asplos20-ae-traces $AE_HOME/benchmarks/
+```
 
 ### Download and install Roadrunner : 
 ```
@@ -53,57 +73,57 @@ source msetup
 ```
 
 ### Extract execution logs
-** This step will take up a lot of time **
 
 If you want to generate full trace for a single benchmark, then you should run :
 ```
-python gen_trace.py <benchmark_name>
+python gen_trace.py <b>
 ```
-Here, `<benchmark_name>` could be something like `philo`.
+Here, `<b>` could be something like `philo`.
 
 Alternatively, you could generate traces for all benchmarks as:
 ```
 python gen_trace.py
 ```
 
-This step generates files `$AE_HOME/benchmarks/<benchmark_name>/full_trace.rr`, either for particular benchmark or for all benchmarks depending upon which of the above two commands you ran.
+This step generates files `$AE_HOME/benchmarks/<b>/full_trace.rr`, either for particular benchmark or for all benchmarks depending upon which of the above two commands you ran.
 
 
 ### Account for atomicity specifications
-** This step will take up a lot of time **
 
 If you want to modify the trace for a single benchmark:
 ```
-python atom_spec.py <benchmark_name>
+python atom_spec.py <b>
 ```
-Here, `<benchmark_name>` could be something like `philo`.
+Here, `<b>` could be something like `philo`.
 
 Alternatively, you could generate traces for all benchmarks as:
 ```
 python atom_spec.py
 ```
 
-This step generates files `$AE_HOME/benchmarks/<benchmark_name>/trace.rr`, either for particular benchmark or for all benchmarks depending upon which of the above two commands you ran.
+This step generates files `$AE_HOME/benchmarks/<b>/trace.std`, either for particular benchmark or for all benchmarks depending upon which of the above two commands you ran.
 
-At this point, the files `$AE_HOME/benchmarks/<benchmark_name>/full_trace.rr` are redundant. You may want to delete them.
+At this point, the files `$AE_HOME/benchmarks/<b>/full_trace.rr` are redundant. You may want to delete them.
 
-## Getting Trace metadata
+##  Step-3: Analyses
+
+### Getting Trace metadata
 
 If you want to get the metadata about the trace of a single benchmark:
 ```
 python metainfo.py <benchmark_name>
 ```
-Here, `<benchmark_name>` could be something like `philo`.
+Here, `<b>` could be something like `philo`.
 
-Alternatively, if you have generated `trace.rr` for all benchmarks, you could analyze the traces for all benchmarks as follows.
+Alternatively, if you have `trace.std` for all benchmarks, you could analyze the traces for all benchmarks as follows.
 ```
 python metainfo.py
 ```
 
 This step generates the following files either for particular benchmark or for all benchmarks depending upon which of the above two commands you ran:
-	- `$AE_HOME/benchmarks/<benchmark_name>/metainfo.txt`
-	- `$AE_HOME/benchmarks/<benchmark_name>/metainfo.err`
-	- `$AE_HOME/benchmarks/<benchmark_name>/metainfo.tim`
+	- `$AE_HOME/benchmarks/<b>/metainfo.txt`
+	- `$AE_HOME/benchmarks/<b>/metainfo.err`
+	- `$AE_HOME/benchmarks/<b>/metainfo.tim`
 
 The file `metainfo.err` should ideally be empty. If it is not empty, it contains error information from the Java command run in the python script `metainfo.py`.
 
@@ -134,9 +154,9 @@ The 2nd, 3rd and 4th lines describe the number of threads, locks and variables i
 The 5th and 6th line describe the number of variables that were read from and written to.
 The later lines describe the number of events (total and of different kinds).
 
-The file `metainfo.tim` reports the time taken.
+The file `metainfo.tim` reports the time taken for this analysis.
 
-## Running Aerodrome
+### Running Aerodrome
 
 If you want to analyze the trace for a single benchmark:
 ```
@@ -159,21 +179,20 @@ The file `aerodrome.err` should ideally be empty. If it is not empty, it contain
 The file `aerodrome.txt` contains the actual output.
 An example is below:
 ```
-2
 Analysis complete
 Number of events analyzed = 6176
-Number of violations found = 1
+Atomicity violation detected.
 Time for full analysis = 65 milliseconds
 ```
 The last three lines are the most important lines. 
 The last line reports the total time taken.
-The penultimate line denotes if a violation is found. If there is no violation, it says `Number of violations found = 0`.
+The penultimate line denotes that a violation is found. If there is no violation, it says `No atomicity violation detected.`.
 The 3rd last line indicates the total number of events analyzed before the violation was reported (or all events if no violation was reported).
 The other lines are for debugging purposes.
 
 The file `aerodrome.tim` reports the time taken.
 
-## Running Velodrome
+### Running Velodrome
 
 If you want to analyze the trace for a single benchmark:
 ```
@@ -198,18 +217,16 @@ An example is below:
 ```
 2
 Analysis complete
+Atomicity violation detected.
 Number of events analyzed = 6176
-Number of violations found = 1
 Number of transactions remaining = 5
 Time for full analysis = 61 milliseconds
 ```
 The last four lines are the most important lines. 
 The last line reports the total time taken.
 The 2nd last line denotes the number of transactions remaining in the transaction graph of Velodrome's analysis at the time the analysis ended.
-The 3rd last line denotes if a violation is found. If there is no violation, it says `Number of violations found = 0`.
+The 3rd last line denotes that a violation is found. If there is no violation, it says `No atomicity violation detected.`.
 The 4th last line indicates the total number of events analyzed before the violation was reported (or all events if no violation was reported).
 The other lines are for debugging purposes.
 
 The file `velodrome.tim` reports the time taken.
-
-
