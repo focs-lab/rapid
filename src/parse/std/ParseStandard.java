@@ -135,6 +135,14 @@ public class ParseStandard {
 
 			e.updateEvent(totEvents, LID, ename, eInfo.type, t, null, null, target);
 		}
+		
+		else if (eInfo.type.isBegin()) {
+			e.updateEvent(totEvents, LID, ename, eInfo.type, t, null, null, null);
+		}
+		
+		else if (eInfo.type.isEnd()) {
+			e.updateEvent(totEvents, LID, ename, eInfo.type, t, null, null, null);
+		}
 
 		else {
 			throw new IllegalArgumentException("Illegal type of event " + eInfo.type.toString());
@@ -173,4 +181,19 @@ public class ParseStandard {
 	public int getTotalThreads(){
 		return totThreads;
 	}
+	
+	public static void demo(){
+		String traceFile = "/Users/umang/Desktop/trace.txt";
+		Event e = new Event();
+		ParseStandard parser = new ParseStandard(traceFile);
+		while(parser.hasNext()){
+			parser.getNextEvent(e);
+			System.out.println(e.toCompactString());
+		}
+	}
+	
+	public static void main(String args[]){
+		demo();
+	}
+
 }

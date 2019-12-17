@@ -9,7 +9,7 @@ import parse.util.CannotParseException;
 import parse.util.EventInfo;
 
 public class Parse {
-	// ACQUIRE, RELEASE, READ, WRITE, FORK, JOIN;
+	// ACQUIRE, RELEASE, READ, WRITE, FORK, JOIN, BEGIN, END, BRANCH;
 		public static String matchStr[] = { "acq", "rel", "r", "w", "fork", "join", "begin", "end", "dummy" };
 		
 		public static String prefixPattern = "^(";
@@ -34,16 +34,17 @@ public class Parse {
 
 		public static void example() {
 //			String line = "345|T20|sync(z)";
-			String line = "345|T20|join(T1)";
+//			String line = "T20|join(T1)|345";
+			String line = "T20|branch|345";
 			Parse parse = new Parse();
 			EventInfo eInfo = new EventInfo();
 			try{
 				parse.getInfo(eInfo, line);
-				System.out.println(eInfo);
 			}
 			catch(CannotParseException e){
 				System.out.println("Could not parse  !");
 			}
+			System.out.println("Parsed successfully : " + eInfo);
 		}
 	
 		public void getInfoOp(EventInfo eInfo, String th, String loc, Matcher matcher) {
@@ -62,18 +63,27 @@ public class Parse {
 				String thId = eArray[0];
 				String op = eArray[1];
 				String locId = eArray[2];
-				Matcher matcher = genericEventPattern.matcher(op);
-				if (matcher.find()) {
-					Matcher primitiveMatcher = primitiveEventPattern.matcher(op);
-					if(primitiveMatcher.find()){
-						getInfoOp(eInfo, thId, locId, primitiveMatcher);
-					}
-					else{
+				if(op.startsWith("begin")){
+					eInfo.updateEventInfo(EventType.BEGIN, thId, null, locId);
+				}
+				else if(op.startsWith("end")){
+					eInfo.updateEventInfo(EventType.END, thId, null, locId);
+				}
+				else{
+					Matcher matcher = genericEventPattern.matcher(op);
+					if (matcher.find()) {
+						Matcher primitiveMatcher = primitiveEventPattern.matcher(op);
+						if(primitiveMatcher.find()){
+							getInfoOp(eInfo, thId, locId, primitiveMatcher);
+						}
+						else{
+							throw new CannotParseException(line);
+						}
+					} else {
 						throw new CannotParseException(line);
 					}
-				} else {
-					throw new CannotParseException(line);
 				}
+				
 			}
 		}
 		

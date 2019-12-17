@@ -1,4 +1,6 @@
 
+
+
 ## Overview
 
 **Paper** : Atomicity Checking in Linear Time using Vector Clocks, ASPLOS'20
@@ -15,8 +17,9 @@ Here we describe how to run AeroDrome and Velodrome to reproduce results from ou
 ## Directory Structure
 
 ```
-Paper576-AE
+AE/
 |--- README.md
+|--- LICENSE
 |--- atomicity_specs/
 |--- benchmarks/
 |--- scripts/
@@ -46,11 +49,12 @@ For this, we need our tool [RAPID](https://github.com/umangm/rapid/). RAPID can 
 	- The [`Velodrome`]([https://github.com/umangm/rapid/blob/master/src/Velodrome.java](https://github.com/umangm/rapid/blob/master/src/Velodrome.java)) in RAPID determines atomicity violations using the prior state-of-the-art algorithm Velodrome.
 
 **Remark** - In the following we will assume that the directory in which this `README` file is located is stored in the environment variables $AE_HOME.
-For example, if your directory is `/path/to/Paper576-AE/`, then you would execute:
+For example, if your directory is `/path/to/AE/`, then you would execute:
 ```
-export AE_HOME=/path/to/asplos-ae
+export AE_HOME=/path/to/AE/
 ```
 Also, you need to change the variable `home` in the file `scripts/util.py` (line 17) to be the value of $AE_HOME .
+Also set the environment variables `JAVA_HOME` and `JVM_ARGS` in the same file.
 
 ## Steps 1 & 2: Generating traces and Accounting for Atomicity Specifications
 
@@ -66,8 +70,9 @@ mv $AE_HOME/asplos20-ae-traces $AE_HOME/benchmarks/
 ### Download and install Roadrunner : 
 ```
 cd $AE_HOME
-git clone https://github.com/stephenfreund/RoadRunner
+git clone git@github.com:stephenfreund/RoadRunner.git
 cd $AE_HOME/RoadRunner
+wget https://raw.githubusercontent.com/umangm/rapid/master/notes/PrintSubsetTool.java.txt -O $AE_HOME/RoadRunner/src/rr/simple/PrintSubsetTool.java
 ant
 source msetup
 ```
@@ -89,6 +94,13 @@ This step generates files `$AE_HOME/benchmarks/<b>/full_trace.rr`, either for pa
 
 
 ### Account for atomicity specifications
+First install RAPID - 
+```
+cd $AE_HOME
+git clone git@github.com:umangm/rapid.git
+cd $AE_HOME/rapid
+ant jar
+```
 
 If you want to modify the trace for a single benchmark:
 ```
@@ -106,6 +118,15 @@ This step generates files `$AE_HOME/benchmarks/<b>/trace.std`, either for partic
 At this point, the files `$AE_HOME/benchmarks/<b>/full_trace.rr` are redundant. You may want to delete them.
 
 ##  Step-3: Analyses
+
+### Install RAPID
+If not already installed, perform the following steps:
+```
+cd $AE_HOME
+git clone git@github.com:umangm/rapid.git
+cd $AE_HOME/rapid
+ant jar
+```
 
 ### Getting Trace metadata
 
@@ -164,7 +185,7 @@ python aerodrome.py <b>
 ```
 Here, `<b>` could be something like `philo`.
 
-Alternatively, if you have generated `trace.rr` for all benchmarks, you could analyze the traces for all benchmarks as follows.
+Alternatively, if you have generated `trace.std` for all benchmarks, you could analyze the traces for all benchmarks as follows.
 ```
 python aerodrome.py
 ```
@@ -184,11 +205,10 @@ Number of events analyzed = 6176
 Atomicity violation detected.
 Time for full analysis = 65 milliseconds
 ```
-The last three lines are the most important lines. 
+The second line indicates that before the analyses finished, the first 6176 events in the trace were analyzed by AeroDrome.
+The third line denotes that an atomicity violation was reported by AeroDrome.
+In examples when no violation is reported, this line would be `No atomicity violation detected.`
 The last line reports the total time taken.
-The penultimate line denotes that a violation is found. If there is no violation, it says `No atomicity violation detected.`.
-The 3rd last line indicates the total number of events analyzed before the violation was reported (or all events if no violation was reported).
-The other lines are for debugging purposes.
 
 The file `aerodrome.tim` reports the time taken.
 
@@ -215,18 +235,16 @@ The file `velodrome.err` should ideally be empty. If it is not empty, it contain
 The file `velodrome.txt` contains the actual output.
 An example is below:
 ```
-2
 Analysis complete
-Atomicity violation detected.
 Number of events analyzed = 6176
+Atomicity violation detected.
 Number of transactions remaining = 5
 Time for full analysis = 61 milliseconds
 ```
-The last four lines are the most important lines. 
+The second line indicates that before the analyses finished, the first 6176 events in the trace were analyzed by Velodrome.
+The third line denotes that an atomicity violation was reported by Velodrome.
+In examples when no violation is reported, this line would be `No atomicity violation detected.`
+The fourth line indicates the total number of events analyzed before the violation was reported (or all events if no violation was reported).
 The last line reports the total time taken.
-The 2nd last line denotes the number of transactions remaining in the transaction graph of Velodrome's analysis at the time the analysis ended.
-The 3rd last line denotes that a violation is found. If there is no violation, it says `No atomicity violation detected.`.
-The 4th last line indicates the total number of events analyzed before the violation was reported (or all events if no violation was reported).
-The other lines are for debugging purposes.
 
 The file `velodrome.tim` reports the time taken.
