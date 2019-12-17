@@ -83,10 +83,6 @@ public class ParseRoadRunner {
 		catch (FileNotFoundException ex) {
 			System.out.println("Unable to open file '" + excludeFile + "'");
 		}
-		
-		//Finally, add ".run()V" and ".main(" in the exclude patterns
-		excludedPatterns.add(".run()V");
-		excludedPatterns.add(".main(");
 	}
 	
 	private void computeThreadsAndResetState(String traceFile, boolean computeThreadSetAPriori) {

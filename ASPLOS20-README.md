@@ -111,7 +111,7 @@ At this point, the files `$AE_HOME/benchmarks/<b>/full_trace.rr` are redundant. 
 
 If you want to get the metadata about the trace of a single benchmark:
 ```
-python metainfo.py <benchmark_name>
+python metainfo.py <b>
 ```
 Here, `<b>` could be something like `philo`.
 
@@ -160,9 +160,9 @@ The file `metainfo.tim` reports the time taken for this analysis.
 
 If you want to analyze the trace for a single benchmark:
 ```
-python aerodrome.py <benchmark_name>
+python aerodrome.py <b>
 ```
-Here, `<benchmark_name>` could be something like `philo`.
+Here, `<b>` could be something like `philo`.
 
 Alternatively, if you have generated `trace.rr` for all benchmarks, you could analyze the traces for all benchmarks as follows.
 ```
@@ -170,9 +170,9 @@ python aerodrome.py
 ```
 
 This step generates the following files either for particular benchmark or for all benchmarks depending upon which of the above two commands you ran:
-	- `$AE_HOME/benchmarks/<benchmark_name>/aerodrome.txt`
-	- `$AE_HOME/benchmarks/<benchmark_name>/aerodrome.err`
-	- `$AE_HOME/benchmarks/<benchmark_name>/aerodrome.tim`
+	- `$AE_HOME/benchmarks/<b>/aerodrome.txt`
+	- `$AE_HOME/benchmarks/<b>/aerodrome.err`
+	- `$AE_HOME/benchmarks/<b>/aerodrome.tim`
 
 The file `aerodrome.err` should ideally be empty. If it is not empty, it contains error information from the Java command run in the python script `aerodrome.py`.
 
@@ -196,9 +196,9 @@ The file `aerodrome.tim` reports the time taken.
 
 If you want to analyze the trace for a single benchmark:
 ```
-python velodrome.py <benchmark_name>
+python velodrome.py <b>
 ```
-Here, `<benchmark_name>` could be something like `philo`.
+Here, `<b>` could be something like `philo`.
 
 Alternatively, if you have generated `trace.rr` for all benchmarks, you could analyze the traces for all benchmarks as follows.
 ```
@@ -206,9 +206,9 @@ python velodrome.py
 ```
 
 This step generates the following files either for particular benchmark or for all benchmarks depending upon which of the above two commands you ran:
-	- `$AE_HOME/benchmarks/<benchmark_name>/velodrome.txt`
-	- `$AE_HOME/benchmarks/<benchmark_name>/velodrome.err`
-	- `$AE_HOME/benchmarks/<benchmark_name>/velodrome.tim`
+	- `$AE_HOME/benchmarks/<b>/velodrome.txt`
+	- `$AE_HOME/benchmarks/<b>/velodrome.err`
+	- `$AE_HOME/benchmarks/<b>/velodrome.tim`
 
 The file `velodrome.err` should ideally be empty. If it is not empty, it contains error information from the Java command run in the python script `aerodrome.py`.
 
