@@ -137,3 +137,5 @@ RAPID supports reading files specified in RoadRunner, STD, RVPredict or CSV form
 [10]: https://dl.acm.org/citation.cfm?id=1375618
 [11]: http://umathur3.web.engr.illinois.edu/papers/aerodrome-asplos20.pdf
 [12]: https://github.com/stephenfreund/RoadRunner/
+
+Rapid icon made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
