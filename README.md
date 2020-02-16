@@ -1,3 +1,5 @@
+<a href="url"><img src="rapid-transparent.png" align="right" width="200" ></a>
+
 ## RAPID : Dynamic Analysis for Concurrent Programs
 
 RAPID is a lightweight framework for implementing dynamic race detection engines.
