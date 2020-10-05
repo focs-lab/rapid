@@ -1,3 +1,5 @@
+<a href="url"><img src="rapid.png" align="right" width="120" ></a>
+
 ## RAPID : Dynamic Analysis for Concurrent Programs
 
 RAPID is a lightweight framework for implementing dynamic race detection engines.
@@ -135,3 +137,6 @@ RAPID supports reading files specified in RoadRunner, STD, RVPredict or CSV form
 [10]: https://dl.acm.org/citation.cfm?id=1375618
 [11]: http://umathur3.web.engr.illinois.edu/papers/aerodrome-asplos20.pdf
 [12]: https://github.com/stephenfreund/RoadRunner/
+
+___
+Rapid icon made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
