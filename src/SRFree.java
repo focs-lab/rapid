@@ -1,6 +1,6 @@
 import cmd.CmdOptions;
 import cmd.GetOptions;
-import engine.racedetection.syncreversalfree.distance.SRFreeOfflineEngine;
+import engine.racedetectionengine.syncreversalfree.distance.SRFreeOfflineEngine;
 
 public class SRFree {
 
