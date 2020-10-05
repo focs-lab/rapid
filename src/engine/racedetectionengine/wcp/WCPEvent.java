@@ -179,9 +179,11 @@ public class WCPEvent extends RaceDetectionEvent<WCPState>{
 		P_l.copyFrom(P_t);	//Line 9 of algorithm
 
 		state.updateViewAsWriterAtRelease(getLock(), getThread());	//Line 10 of algorithm
-		state.incClockThread(getThread());	//Vector clock increment at the end of a release event
 
 		this.printRaceInfo(state, verbosity);
+		
+		state.incClockThread(getThread());	//Vector clock increment at the end of a release event
+
 
 		return false;
 	}
@@ -211,6 +213,7 @@ public class WCPEvent extends RaceDetectionEvent<WCPState>{
 								this.getVariable(), 
 								this.getThread()
 								);
+						System.out.println("lock = " + l.toString() + ", L_l_w = " + writeClock.toString());
 						P_t.updateWithMax(P_t, writeClock);	//Body of loop at Line 11 of algorithm
 					}
 				}
@@ -326,8 +329,8 @@ public class WCPEvent extends RaceDetectionEvent<WCPState>{
 			VectorClock P_tc = state.getVectorClock(state.WCPPredecessorThread, this.getTarget());
 			P_tc.updateWithMax(C_t, H_t);	//Update the WCP predecessor of the child (forked) thread
 
-			state.incClockThread(this.getThread());
 			this.printRaceInfo(state, verbosity);
+			state.incClockThread(this.getThread());
 		}
 		return false;
 	}
