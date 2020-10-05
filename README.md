@@ -112,7 +112,7 @@ The current distribution includes the following race detection engines :
 6. Race Detection using the [SHB][9] partial order (see [`engine.racedetectionengine.shb`](src/engine/racedetectionengine/shb))
 7. Race detection using the [SHB][9] partial order with epoch optimization (see [`engine.racedetectionengine.shb_epoch`](src/engine/racedetectionengine/shb_epoch))
 8. Race detection using [WCP][1] partial order ([`engine.racedetectionengine.wcp`](src/engine/racedetectionengine/wcp))
-9. Race detection for [Sync-Refersal Free Races][13] ([`engine.racedetectionengine.syncreversalfree`](src/engine/racedetectionengine/syncreversalfree))
+9. Race detection for [Sync-Preserving Races][13] ([`engine.racedetectionengine.syncpreserving`](src/engine/racedetectionengine/syncpreserving))
 10. [Velodrome][10] algorithm for detecting atomicity violations (see [`engine.atomicity.conflictserializability.velodrome`](src/engine/atomicity/conflictserializability/velodome))
 11. [Aerodrome][11] algorithm for detecting atomicity violations (see [`engine.atomicity.conflictserializability.aerodrome_basic`](src/engine/atomicity/conflictserializability/aerodrome_basic) for the basic algorithm and [`engine.atomicity.conflictserializability.aerodrome`](src/engine/atomicity/conflictserializability/aerodrome/) for Aerodrome with optimizations)
 
