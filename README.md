@@ -112,8 +112,9 @@ The current distribution includes the following race detection engines :
 6. Race Detection using the [SHB][9] partial order (see [`engine.racedetectionengine.shb`](src/engine/racedetectionengine/shb))
 7. Race detection using the [SHB][9] partial order with epoch optimization (see [`engine.racedetectionengine.shb_epoch`](src/engine/racedetectionengine/shb_epoch))
 8. Race detection using [WCP][1] partial order ([`engine.racedetectionengine.wcp`](src/engine/racedetectionengine/wcp))
-9. [Velodrome][10] algorithm for detecting atomicity violations (see [`engine.atomicity.conflictserializability.velodrome`](src/engine/atomicity/conflictserializability/velodome))
-10. [Aerodrome][11] algorithm for detecting atomicity violations (see [`engine.atomicity.conflictserializability.aerodrome_basic`](src/engine/atomicity/conflictserializability/aerodrome_basic) for the basic algorithm and [`engine.atomicity.conflictserializability.aerodrome`](src/engine/atomicity/conflictserializability/aerodrome/) for Aerodrome with optimizations)
+9. Race detection for [Sync-Refersal Free Races][13] ([`engine.racedetectionengine.syncreversalfree`](src/engine/racedetectionengine/syncreversalfree))
+10. [Velodrome][10] algorithm for detecting atomicity violations (see [`engine.atomicity.conflictserializability.velodrome`](src/engine/atomicity/conflictserializability/velodome))
+11. [Aerodrome][11] algorithm for detecting atomicity violations (see [`engine.atomicity.conflictserializability.aerodrome_basic`](src/engine/atomicity/conflictserializability/aerodrome_basic) for the basic algorithm and [`engine.atomicity.conflictserializability.aerodrome`](src/engine/atomicity/conflictserializability/aerodrome/) for Aerodrome with optimizations)
 
 The above packages also give a fair idea on how to write your favorite dynamic analysis engine in RAPID.
 
@@ -135,8 +136,9 @@ RAPID supports reading files specified in RoadRunner, STD, RVPredict or CSV form
 [8]: https://dl.acm.org/citation.cfm?id=265927
 [9]: https://dl.acm.org/citation.cfm?id=3276515
 [10]: https://dl.acm.org/citation.cfm?id=1375618
-[11]: http://umathur3.web.engr.illinois.edu/papers/aerodrome-asplos20.pdf
+[11]: https://dl.acm.org/doi/10.1145/3373376.3378475
 [12]: https://github.com/stephenfreund/RoadRunner/
+[13]: http://umathur3.web.engr.illinois.edu/papers/sync-reversal-race.pdf
 
 ___
 Rapid icon made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
