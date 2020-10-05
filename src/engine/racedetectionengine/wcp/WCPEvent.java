@@ -213,7 +213,6 @@ public class WCPEvent extends RaceDetectionEvent<WCPState>{
 								this.getVariable(), 
 								this.getThread()
 								);
-						System.out.println("lock = " + l.toString() + ", L_l_w = " + writeClock.toString());
 						P_t.updateWithMax(P_t, writeClock);	//Body of loop at Line 11 of algorithm
 					}
 				}

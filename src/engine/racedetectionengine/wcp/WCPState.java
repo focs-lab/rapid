@@ -10,6 +10,7 @@ import engine.racedetectionengine.State;
 import event.Lock;
 import event.Thread;
 import event.Variable;
+import util.vectorclock.ClockPair;
 import util.vectorclock.VectorClock;
 
 //Manages the clocks and other data structures used by the WCP algorithm
@@ -331,7 +332,7 @@ public class WCPState extends State {
 			throw new IllegalArgumentException("Invalid operation : No critical section on lock " + l.getName() + " in thread " + t.getName());
 		}
 		VectorClock C_t = generateVectorClockFromClockThread(t);
-		view.pushClockPair(l, new WCPClockPair(C_t));
+		view.pushClockPair(l, new ClockPair(C_t));
 	}
 	
 	public void readViewOfWriters(Lock l, Thread t) {
