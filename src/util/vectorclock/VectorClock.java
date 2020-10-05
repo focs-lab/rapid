@@ -2,7 +2,7 @@ package util.vectorclock;
 
 import java.util.Vector;
 
-public class VectorClock {
+public class VectorClock implements Comparable<VectorClock> {
 
 	private int dim;
 	private Vector<Integer> clock;
@@ -25,8 +25,8 @@ public class VectorClock {
 	}
 
 	public int getDim() {
-		if(!(this.dim == this.clock.size())){
-			throw new IllegalArgumentException("Mismatch in dim and clock size"); 
+		if (!(this.dim == this.clock.size())) {
+			throw new IllegalArgumentException("Mismatch in dim and clock size");
 		}
 		return this.dim;
 	}
@@ -38,14 +38,6 @@ public class VectorClock {
 	public String toString() {
 		return this.clock.toString();
 	}
-
-	/* public void inc(int ind) {
-		if(! ((ind < this.dim) && (ind >= 0)) ){
-			throw new IllegalArgumentException("You are attempting to access the vector clock with an illegal index");
-		}
-		int new_clock_val = this.clock.get(ind) + 1;
-		this.clock.set(ind, (Integer) new_clock_val);
-	} */
 
 	public boolean isZero() {
 		boolean itIsZero = true;
@@ -60,8 +52,8 @@ public class VectorClock {
 	}
 
 	public boolean isEqual(VectorClock vc) {
-		if(! (this.dim == vc.getDim()) ){
-			throw new IllegalArgumentException("Mismatch in this.dim and argument.dim"); 
+		if (!(this.dim == vc.getDim())) {
+			throw new IllegalArgumentException("Mismatch in this.dim and argument.dim");
 		}
 		boolean itIsEqual = true;
 		Vector<Integer> vcClock = vc.getClock();
@@ -78,8 +70,8 @@ public class VectorClock {
 	}
 
 	public boolean isLessThanOrEqual(VectorClock vc) {
-		if(! (this.dim == vc.getDim()) ){
-			throw new IllegalArgumentException("Mismatch in this.dim and argument.dim"); 
+		if (!(this.dim == vc.getDim())) {
+			throw new IllegalArgumentException("Mismatch in this.dim and argument.dim");
 		}
 		boolean itIsLessThanOrEqual = true;
 		Vector<Integer> vcClock = vc.getClock();
@@ -96,22 +88,22 @@ public class VectorClock {
 
 	public void setToZero() {
 		for (int ind = 0; ind < this.dim; ind++) {
-			this.clock.set(ind, (Integer) 0 );
+			this.clock.set(ind, (Integer) 0);
 		}
 	}
-	
+
 	public void copyFrom(VectorClock vc) {
-		if(! (this.dim == vc.getDim()) ){
-			throw new IllegalArgumentException("Mismatch in this.dim and argument.dim"); 
+		if (!(this.dim == vc.getDim())) {
+			throw new IllegalArgumentException("Mismatch in this.dim and argument.dim");
 		}
 		for (int ind = 0; ind < this.dim; ind++) {
 			this.clock.set(ind, (Integer) vc.clock.get(ind));
 		}
-	}	
-	
+	}
+
 	private void updateMax2(VectorClock vc) {
-		if(! (this.dim == vc.getDim()) ){
-			throw new IllegalArgumentException("Mismatch in this.dim and argument.dim"); 
+		if (!(this.dim == vc.getDim())) {
+			throw new IllegalArgumentException("Mismatch in this.dim and argument.dim");
 		}
 		for (int ind = 0; ind < this.dim; ind++) {
 			int this_c = this.clock.get(ind);
@@ -120,79 +112,95 @@ public class VectorClock {
 			this.clock.set(ind, (Integer) max_c);
 		}
 	}
-	
+
+	// The following function update this as : this := \lambda t . if t == tIndex
+	// then this[tIndex] else max(this[t], vc[t])
+	public void updateMax2WithoutLocal(VectorClock vc, int tIndex) {
+		if (!(this.dim == vc.getDim())) {
+			throw new IllegalArgumentException("Mismatch in this.dim and argument.dim");
+		}
+		for (int ind = 0; ind < this.dim; ind++) {
+			if (ind != tIndex) {
+				int this_c = this.clock.get(ind);
+				int vc_c = vc.clock.get(ind);
+				int max_c = this_c > vc_c ? this_c : vc_c;
+				this.clock.set(ind, (Integer) max_c);
+			}
+		}
+	}
+
 	public void updateWithMax(VectorClock... vcList) {
-		if(! (vcList.length >= 1) ){
-			throw new IllegalArgumentException("Insuffiecient number of arguments provided"); 
+		if (!(vcList.length >= 1)) {
+			throw new IllegalArgumentException(
+					"Insuffiecient number of arguments provided");
 		}
 		for (int i = 1; i < vcList.length; i++) {
-			if (vcList[i].equals(this)) throw new IllegalArgumentException("If \'this\' is one of the arguments, then it must be the first");
+			if (vcList[i].equals(this))
+				throw new IllegalArgumentException(
+						"If \'this\' is one of the arguments, then it must be the first");
 		}
 
-		//this.setToZero();
+		// this.setToZero();
 		this.copyFrom(vcList[0]);
 		for (int i = 1; i < vcList.length; i++) {
 			VectorClock vc = vcList[i];
-			if (! (this.dim == vc.getDim()) ) {
+			if (!(this.dim == vc.getDim())) {
 				throw new IllegalArgumentException("Mismatch in maxVC.dim and vc.dim");
 			}
 			this.updateMax2(vc);
 		}
 	}
-	
+
 	private void updateMin2(VectorClock vc) {
-		if(! (this.dim == vc.getDim()) ){
-			throw new IllegalArgumentException("Mismatch in this.dim and argument.dim"); 
+		if (!(this.dim == vc.getDim())) {
+			throw new IllegalArgumentException("Mismatch in this.dim and argument.dim");
 		}
 		for (int ind = 0; ind < this.dim; ind++) {
 			int this_c = this.clock.get(ind);
 			int vc_c = vc.clock.get(ind);
-			int max_c = this_c < vc_c ? this_c : vc_c;
-			this.clock.set(ind, (Integer) max_c);
+			int min_c = this_c < vc_c ? this_c : vc_c;
+			this.clock.set(ind, (Integer) min_c);
 		}
 	}
-	
+
 	public void updateWithMin(VectorClock... vcList) {
-		if(! (vcList.length >= 1) ){
-			throw new IllegalArgumentException("Insuffiecient number of arguments provided"); 
+		if (!(vcList.length >= 1)) {
+			throw new IllegalArgumentException(
+					"Insuffiecient number of arguments provided");
 		}
 		for (int i = 1; i < vcList.length; i++) {
-			if (vcList[i].equals(this)) throw new IllegalArgumentException("If \'this\' is one of the arguments, then it must be the first");
+			if (vcList[i].equals(this))
+				throw new IllegalArgumentException(
+						"If \'this\' is one of the arguments, then it must be the first");
 		}
 
-		//this.setToZero();
+		// this.setToZero();
 		this.copyFrom(vcList[0]);
 		for (int i = 1; i < vcList.length; i++) {
 			VectorClock vc = vcList[i];
-			if (! (this.dim == vc.getDim()) ) {
+			if (!(this.dim == vc.getDim())) {
 				throw new IllegalArgumentException("Mismatch in maxVC.dim and vc.dim");
 			}
 			this.updateMin2(vc);
 		}
 	}
-	
-	public int getClockIndex(int tIndex){
+
+	public int getClockIndex(int tIndex) {
 		return this.clock.get(tIndex);
 	}
-	
-	public void setClockIndex(int tIndex, int tValue){
+
+	public void setClockIndex(int tIndex, int tValue) {
 		this.clock.set(tIndex, (Integer) tValue);
 	}
-	
-	/*
-	public int increaseDimension(){
-		this.dim = this.dim + 1 ;
-		this.clock.add(0);
-		assert(this.dim == this.clock.size());
-		return this.dim;
+
+	@Override
+	public int compareTo(VectorClock vc) {
+		if (this.isEqual(vc)) {
+			return 0;
+		} else if (this.isLessThanOrEqual(vc)) {
+			return -1;
+		} else
+			return 1;
 	}
-	
-	public int increaseDimension(int val){
-		this.dim = this.dim + 1 ;
-		this.clock.add(val);
-		assert(this.dim == this.clock.size());
-		return this.dim;
-	}
-	*/
-	
+
 }
