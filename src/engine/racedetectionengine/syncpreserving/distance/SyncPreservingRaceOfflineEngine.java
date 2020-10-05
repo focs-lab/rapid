@@ -1,4 +1,4 @@
-package engine.racedetectionengine.syncreversalfree.distance;
+package engine.racedetectionengine.syncpreserving.distance;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,17 +9,17 @@ import event.Thread;
 import parse.ParserType;
 
 
-public class SRFreeOfflineEngine extends RaceDetectionEngine<SRFreeState, SRFreeEvent> {
+public class SyncPreservingRaceOfflineEngine extends RaceDetectionEngine<SyncPreservingRaceState, SyncPreservingRaceEvent> {
 
 	private HashMap<String, HashSet<String>> lockToThreadSet;
 	private HashSet<String> orderedVariables;
 	
-	public SRFreeOfflineEngine(ParserType pType, String trace_folder) {
+	public SyncPreservingRaceOfflineEngine(ParserType pType, String trace_folder) {
 		super(pType);
 		this.threadSet = new HashSet<Thread> ();
 		initializeReader(trace_folder);
-		this.state = new SRFreeState(this.threadSet);
-		handlerEvent = new SRFreeEvent();
+		this.state = new SyncPreservingRaceState(this.threadSet);
+		handlerEvent = new SyncPreservingRaceEvent();
 
 		boolean time_reporting = true;
 		long startTimeAnalysis = 0;
@@ -41,7 +41,7 @@ public class SRFreeOfflineEngine extends RaceDetectionEngine<SRFreeState, SRFree
 	}
 
 	@Override
-	protected boolean skipEvent(SRFreeEvent handlerEvent){
+	protected boolean skipEvent(SyncPreservingRaceEvent handlerEvent){
 		if(handlerEvent.getType().isAccessType()){
 			String var_name = handlerEvent.getVariable().getName();
 			if(this.orderedVariables.contains(var_name)) {
@@ -57,7 +57,7 @@ public class SRFreeOfflineEngine extends RaceDetectionEngine<SRFreeState, SRFree
 	}
 
 	@Override
-	protected void postHandleEvent(SRFreeEvent handlerEvent) {	
+	protected void postHandleEvent(SyncPreservingRaceEvent handlerEvent) {	
 	}
 	
 	@Override

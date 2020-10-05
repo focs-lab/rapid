@@ -1,4 +1,4 @@
-package engine.racedetectionengine.syncreversalfree;
+package engine.racedetectionengine.syncpreserving;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ import util.ll.EfficientLLView;
 import util.ll.EfficientNode;
 import util.vectorclock.VectorClock;
 
-public class SRFreeState extends State {
+public class SyncPreservingRaceState extends State {
 
 	public static EventType[] accessTypes =  {EventType.READ, EventType.WRITE};
 
@@ -87,7 +87,7 @@ public class SRFreeState extends State {
 	// == parameter flags ==
 	public boolean forceOrder;
 
-	public SRFreeState(HashSet<Thread> tSet) {
+	public SyncPreservingRaceState(HashSet<Thread> tSet) {
 		initInternalData(tSet);
 		initData(tSet);
 	}
@@ -509,7 +509,7 @@ public class SRFreeState extends State {
 			}
 			int ub_local_clock = this.getIndex(ub_clock, v);
 			Pair<VectorClock, Integer> ub = new Pair<VectorClock, Integer> (null, ub_local_clock);
-			for(EventType aprime: SRFreeState.accessTypes) {
+			for(EventType aprime: SyncPreservingRaceState.accessTypes) {
 				if(EventType.conflicting(a, aprime)) {
 					this.accessInfo.get(v).get(aprime).get(x).removePrefixWithinReturnMin(t, lb, this.firstComparatorAccessInfo, ub, this.secondComparatorAccessInfo);
 				}

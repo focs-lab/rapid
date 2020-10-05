@@ -1,26 +1,26 @@
-package engine.racedetectionengine.syncreversalfree;
+package engine.racedetectionengine.syncpreserving.distance;
 
 import java.util.HashSet;
 
-import engine.racedetectionengine.RaceDetectionEvent;
 //import debug.ZROEventStatistics;
+import engine.racedetectionengine.RaceDetectionEvent;
 import event.Thread;
 import event.Variable;
 import event.EventType;
 import event.Lock;
-import util.Pair;
 import util.Quintet;
+import util.Triplet;
 import util.ll.EfficientLLView;
 import util.vectorclock.VectorClock;
 
-public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
+public class SyncPreservingRaceEvent extends RaceDetectionEvent<SyncPreservingRaceState> {
 
 	static final int flushEventDuration = 100000;
 	static int flush_event_ctr = 0;
 
 	@Override
-	public boolean Handle(SRFreeState state, int verbosity) {
-
+	public boolean Handle(SyncPreservingRaceState state, int verbosity) {
+		
 		EventType tp = this.getType();
 
 		// Check if this is a write and the last event was a write
@@ -88,7 +88,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 	}
 
 	@Override
-	public void printRaceInfoLockType(SRFreeState state, int verbosity) {
+	public void printRaceInfoLockType(SyncPreservingRaceState state, int verbosity) {
 		if(this.getType().isLockType()){
 			if(verbosity == 2){
 				String str = "#";
@@ -109,7 +109,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 	}
 
 	@Override
-	public void printRaceInfoAccessType(SRFreeState state, int verbosity) {
+	public void printRaceInfoAccessType(SyncPreservingRaceState state, int verbosity) {
 		if(this.getType().isAccessType()){
 			if(verbosity == 1 || verbosity == 2){
 				String str = "#";
@@ -131,7 +131,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 	}
 
 	@Override
-	public void printRaceInfoExtremeType(SRFreeState state, int verbosity) {
+	public void printRaceInfoExtremeType(SyncPreservingRaceState state, int verbosity) {
 		if(this.getType().isExtremeType()){
 			if(verbosity == 2){
 				String str = "#";
@@ -151,7 +151,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 	}
 
 	@Override
-	public boolean HandleSubAcquire(SRFreeState state, int verbosity) {
+	public boolean HandleSubAcquire(SyncPreservingRaceState state, int verbosity) {
 		Thread t = this.getThread();
 		Lock l = this.getLock();
 
@@ -171,7 +171,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 	}
 
 	@Override
-	public boolean HandleSubRelease(SRFreeState state, int verbosity) {
+	public boolean HandleSubRelease(SyncPreservingRaceState state, int verbosity) {
 		Thread t = this.getThread();
 		Lock l = this.getLock();
 		state.incClockThread(t);
@@ -182,18 +182,18 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 		return false;
 	}
 
-	private EventType getEarlierConflictingEvent(SRFreeState state, Thread t, Variable x, EventType a, Thread u) {
-		Pair<VectorClock, Integer> writeTriplet = null;
+	private EventType getEarlierConflictingEvent(SyncPreservingRaceState state, Thread t, Variable x, EventType a, Thread u) {
+		Triplet<VectorClock, Integer, Long> writeTriplet = null;
 		int writeClock = 0;
-		EfficientLLView<Thread, Pair<VectorClock, Integer>> store_write = state.accessInfo.get(u).get(EventType.WRITE).get(x);
+		EfficientLLView<Thread, Triplet<VectorClock, Integer, Long>> store_write = state.accessInfo.get(u).get(EventType.WRITE).get(x);
 		if(!store_write.isEmpty(t)) {
 			writeTriplet = store_write.bottom(t);
 			writeClock = writeTriplet.second;
 		}
-		Pair<VectorClock, Integer> readTriplet = null;
+		Triplet<VectorClock, Integer, Long> readTriplet = null;
 		int readClock = 0;
 		if(a.equals(EventType.WRITE)) {
-			EfficientLLView<Thread, Pair<VectorClock, Integer>> store_read = state.accessInfo.get(u).get(EventType.READ).get(x);
+			EfficientLLView<Thread, Triplet<VectorClock, Integer, Long>> store_read = state.accessInfo.get(u).get(EventType.READ).get(x);
 			if(!store_read.isEmpty(t)) {
 				readTriplet = store_read.bottom(t);
 				readClock = readTriplet.second;
@@ -212,7 +212,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 		else return null;
 	}
 
-	private boolean checkRaces(SRFreeState state, Thread t, Variable x, EventType a, VectorClock C_pred_t) {
+	private boolean checkRaces(SyncPreservingRaceState state, Thread t, Variable x, EventType a, VectorClock C_pred_t, Long auxId) {
 		HashSet<Thread> threadSet_x = state.variableToThreadSet.get(x);
 		for(Thread u: threadSet_x) {
 			if(!u.equals(t)) {
@@ -220,9 +220,9 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 				while(true) {
 					EventType aprime = getEarlierConflictingEvent(state, t, x, a, u);
 					if(!(aprime == null)) {
-						EfficientLLView<Thread, Pair<VectorClock, Integer>> store = state.accessInfo.get(u).get(aprime).get(x);
+						EfficientLLView<Thread, Triplet<VectorClock, Integer, Long>> store = state.accessInfo.get(u).get(aprime).get(x);
 						if(!store.isEmpty(t)) {
-							Pair<VectorClock, Integer> conflictingTriplet = store.bottom(t);
+							Triplet<VectorClock, Integer, Long> conflictingTriplet = store.bottom(t);
 							VectorClock C_pred_u = conflictingTriplet.first;
 							int C_u_u = conflictingTriplet.second;
 
@@ -252,6 +252,12 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 							state.lastIdeal.put(acquireInfoKey, new VectorClock(I));
 
 							if(!(C_u_u <= state.getIndex(I, u))) {
+								long d = auxId - conflictingTriplet.third;
+								if(state.maxDistance < d) {
+									state.maxDistance = d;
+								}
+								state.sumDistance = state.sumDistance + d;
+								state.numRaces = state.numRaces + 1;
 								return true;
 							}
 							else {
@@ -269,7 +275,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 	}
 
 	@Override
-	public boolean HandleSubRead(SRFreeState state, int verbosity) {
+	public boolean HandleSubRead(SyncPreservingRaceState state, int verbosity) {
 		Thread t = this.getThread();
 		Variable v = this.getVariable();
 		EventType tp = this.getType();
@@ -280,7 +286,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 		boolean emptyLS = state.updateLocksetAtAccess(t, v, tp);
 		boolean raceDetected = false;
 		if(emptyLS) {
-			raceDetected = checkRaces(state, t, v, tp, C_pred_t);
+			raceDetected = checkRaces(state, t, v, tp, C_pred_t, this.getAuxId());
 		}
 
 		// Update and send clocks
@@ -290,7 +296,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 		//Eager computation of closure. Do it after checking for races.
 		C_t.copyFrom(state.updatePointersAtAccessAndGetFixPoint(t, C_t));
 
-		Pair<VectorClock, Integer> infoToStore = new Pair<VectorClock, Integer> (C_pred_t, state.getIndex(C_t, t));
+		Triplet<VectorClock, Integer, Long> infoToStore = new Triplet<VectorClock, Integer, Long> (C_pred_t, state.getIndex(C_t, t), this.getAuxId());
 		state.accessInfo.get(t).get(EventType.READ).get(v).pushTop(infoToStore);
 
 
@@ -299,7 +305,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 	}
 
 	@Override
-	public boolean HandleSubWrite(SRFreeState state, int verbosity) {
+	public boolean HandleSubWrite(SyncPreservingRaceState state, int verbosity) {
 		Thread t = this.getThread();
 		Variable v = this.getVariable();
 		EventType tp = this.getType();
@@ -310,14 +316,14 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 		boolean emptyLS = state.updateLocksetAtAccess(t, v, tp);
 		boolean raceDetected = false;
 		if(emptyLS) {
-			raceDetected = checkRaces(state, t, v, tp, C_pred_t);
+			raceDetected = checkRaces(state, t, v, tp, C_pred_t, this.getAuxId());
 		}
 
 		// Do send stuff
 		state.incClockThread(t);
 		VectorClock LW_v = state.getVectorClock(state.lastWriteVariable, v);
 		LW_v.copyFrom(C_t);
-		Pair<VectorClock, Integer> infoToStore = new Pair<VectorClock, Integer> (C_pred_t, state.getIndex(C_t, t));
+		Triplet<VectorClock, Integer, Long> infoToStore = new Triplet<VectorClock, Integer, Long> (C_pred_t, state.getIndex(C_t, t), this.getAuxId());
 		state.accessInfo.get(t).get(EventType.WRITE).get(v).pushTop(infoToStore);
 
 
@@ -326,7 +332,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 	}
 
 	@Override
-	public boolean HandleSubFork(SRFreeState state, int verbosity) {
+	public boolean HandleSubFork(SyncPreservingRaceState state, int verbosity) {
 		if (state.isThreadRelevant(this.getTarget())) {
 			VectorClock C_t = state.getVectorClock(state.clockThread, this.getThread());			
 			VectorClock C_tc = state.getVectorClock(state.clockThread, this.getTarget());
@@ -339,7 +345,7 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 	}
 
 	@Override
-	public boolean HandleSubJoin(SRFreeState state, int verbosity) {
+	public boolean HandleSubJoin(SyncPreservingRaceState state, int verbosity) {
 		if (state.isThreadRelevant(this.getTarget())) {
 			VectorClock C_t = state.getVectorClock(state.clockThread, this.getThread());
 			VectorClock C_tc = state.getVectorClock(state.clockThread, this.getTarget());
@@ -353,19 +359,19 @@ public class SRFreeEvent extends RaceDetectionEvent<SRFreeState> {
 	}
 
 	@Override
-	public void printRaceInfoTransactionType(SRFreeState state, int verbosity) {
+	public void printRaceInfoTransactionType(SyncPreservingRaceState state, int verbosity) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public boolean HandleSubBegin(SRFreeState state, int verbosity) {
+	public boolean HandleSubBegin(SyncPreservingRaceState state, int verbosity) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean HandleSubEnd(SRFreeState state, int verbosity) {
+	public boolean HandleSubEnd(SyncPreservingRaceState state, int verbosity) {
 		// TODO Auto-generated method stub
 		return false;
 	}

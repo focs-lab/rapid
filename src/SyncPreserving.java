@@ -1,10 +1,10 @@
 import cmd.CmdOptions;
 import cmd.GetOptions;
-import engine.racedetectionengine.syncreversalfree.distance.SRFreeOfflineEngine;
+import engine.racedetectionengine.syncpreserving.distance.SyncPreservingRaceOfflineEngine;
 
-public class SRFree {
+public class SyncPreserving {
 
-	public SRFree() {
+	public SyncPreserving() {
 
 	}
 	
@@ -17,7 +17,7 @@ public class SRFree {
 			startTimeAnalysis = System.currentTimeMillis(); //System.nanoTime();
 		}
 		
-		SRFreeOfflineEngine engine = new SRFreeOfflineEngine(options.parserType, options.path);
+		SyncPreservingRaceOfflineEngine engine = new SyncPreservingRaceOfflineEngine(options.parserType, options.path);
 		engine.analyzeTrace(options.multipleRace, options.verbosity);
 		
 		if(time_reporting){
