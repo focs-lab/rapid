@@ -1,7 +1,7 @@
 import cmd.CmdOptions;
 import cmd.GetOptions;
-import engine.racedetectionengine.shb.SHBEngine;
-import engine.racedetectionengine.shb.SHBOfflineEngine;
+import engine.racedetectionengine.shb.distance.SHBEngine;
+//import engine.racedetectionengine.shb.SHBOfflineEngine;
 
 public class SHB {
 
@@ -18,7 +18,7 @@ public class SHB {
 			startTimeAnalysis = System.currentTimeMillis();
 		}
 		
-		SHBOfflineEngine engine = new SHBOfflineEngine(options.parserType, options.path);
+		SHBEngine engine = new SHBEngine(options.parserType, options.path);
 		engine.analyzeTrace(options.multipleRace, options.verbosity);
 		
 		if(time_reporting){
