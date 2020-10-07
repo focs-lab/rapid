@@ -75,8 +75,8 @@ public class WCPEngine extends RaceDetectionEngine<WCPState, WCPEvent> {
 		if (enablePrintStatus) {
 //			System.out.println("Num races = " + state.numRaces);
 			System.out.println("Number of 'racy' variables = " + state.racyVars.size());
-			System.out.println("Max distance = " + state.maxMaxDistance);
-			double avg_d_max = ((double) state.sumMaxDistance)
+			System.out.println("Max distance = " + state.maxMinDistance);
+			double avg_d_max = ((double) state.sumMinDistance)
 					/ ((double) state.numRaces);
 			System.out.println("Avg. distance = " + avg_d_max);
 		}
