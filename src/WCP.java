@@ -1,6 +1,6 @@
 import cmd.CmdOptions;
 import cmd.GetOptions;
-import engine.racedetectionengine.wcp.WCPEngine;
+import engine.racedetectionengine.wcp.distance.WCPEngine;
 
 public class WCP {
 

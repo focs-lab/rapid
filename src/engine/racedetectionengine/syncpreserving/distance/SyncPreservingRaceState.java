@@ -84,6 +84,7 @@ public class SyncPreservingRaceState extends State {
 	public long maxDistance = 0;
 	public long sumDistance = 0;
 	public long numRaces = 0;
+	public HashSet<Integer> racyVars = new HashSet<Integer> ();
 
 	// == parameter flags ==
 	public boolean forceOrder;

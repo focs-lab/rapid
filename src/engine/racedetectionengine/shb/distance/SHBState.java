@@ -34,12 +34,14 @@ public class SHBState extends State {
 	// Distance stats
 	public ArrayList<HashMap<Thread, Long>> readVariableAuxId;
 	public ArrayList<HashMap<Thread, Long>> writeVariableAuxId;
+	
 	// == stats ==
 	public long maxMaxDistance = 0;
 	public long sumMaxDistance = 0;
 	public long maxMinDistance = 0;
 	public long sumMinDistance = 0;
 	public long numRaces = 0;
+	public HashSet<Integer> racyVars = new HashSet<Integer> ();
 
 	//parameter flags
 	public boolean forceOrder;

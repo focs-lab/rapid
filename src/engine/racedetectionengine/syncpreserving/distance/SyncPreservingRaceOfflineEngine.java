@@ -64,7 +64,8 @@ public class SyncPreservingRaceOfflineEngine extends RaceDetectionEngine<SyncPre
 	protected void printCompletionStatus() {
 		super.printCompletionStatus();
 		if(enablePrintStatus) {
-			System.out.println("Num races = " + state.numRaces);
+//			System.out.println("Num races = " + state.numRaces);
+			System.out.println("Number of 'racy' variables = " + state.racyVars.size());
 			System.out.println("Max race distance = " + state.maxDistance);
 			double avg_d = ((double) state.sumDistance) / ((double) state.numRaces);
 			System.out.println("Avg. race distance = " + avg_d);

@@ -46,16 +46,7 @@ public class SyncPreservingRaceEvent extends RaceDetectionEvent<SyncPreservingRa
 		}
 
 		boolean toReturn;
-		//		if(ZROEventStatistics.isEnabled()) {
-		//			long startTime = System.currentTimeMillis();
-		//
-		//			toReturn = this.HandleSub(state);
-		//
-		//			long stopTime = System.currentTimeMillis();
-		//			ZROEventStatistics.updateTime(this.getType(), (stopTime - startTime));
-		//		} else {
 		toReturn = this.HandleSub(state, verbosity);
-		//		}
 
 		state.lastDecor = -1;
 		state.lastThread = -1;
@@ -73,18 +64,12 @@ public class SyncPreservingRaceEvent extends RaceDetectionEvent<SyncPreservingRa
 			flush_event_ctr = 0;
 		}
 
-		/*
-		Thread t = this.getThread();
-		HashSet<Lock> locksHeld = state.threadToLocksHeld.get(t);
-		if(!locksHeld.isEmpty()){
-			int local_clock = state.getIndex(state.getVectorClock(state.clockThread, t), t);
-			Pair<Integer, HashSet<Lock>> pair_to_store = new Pair<Integer, HashSet<Lock>> (local_clock, new HashSet<Lock> (locksHeld));
-			state.openLockInfo.get(t).pushTop(pair_to_store);
+		// Racy vars
+		if(toReturn) {
+			state.racyVars.add(this.getVariable().getId());
 		}
-		 */
-
+		
 		return toReturn;
-		//		return this.HandleSub(state);
 	}
 
 	@Override

@@ -57,11 +57,18 @@ public class SHBOfflineEngine extends RaceDetectionEngine<SHBState, SHBEvent> {
 
 	@Override
 	protected void postHandleEvent(SHBEvent handlerEvent) {	
-//		if(handlerEvent.getType().isAccessType()){
-//			if(state.verbosity == 1 || state.verbosity == 2){
-//				System.out.println();
-//			}	
-//		}
+	}
+	
+	@Override
+	protected void printCompletionStatus() {
+		super.printCompletionStatus();
+		if(enablePrintStatus) {
+//			System.out.println("Num races = " + state.numRaces);
+			System.out.println("Number of 'racy' variables = " + state.racyVars.size());
+			System.out.println("Max distance = " + state.maxMaxDistance);
+			double avg_d_max = ((double) state.sumMaxDistance) / ((double) state.numRaces);
+			System.out.println("Avg. distance = " + avg_d_max);
+		}
 	}
 
 }
