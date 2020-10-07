@@ -11,7 +11,7 @@ public class WCP {
 	public static void main(String[] args) {		
 		CmdOptions options = new GetOptions(args).parse();
 		
-		boolean time_reporting = false;
+		boolean time_reporting = true;
 		long startTimeAnalysis = 0;
 		if(time_reporting){
 			startTimeAnalysis = System.currentTimeMillis(); //System.nanoTime();
