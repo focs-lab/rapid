@@ -120,10 +120,11 @@ public class SHBEvent extends RaceDetectionEvent<SHBState> {
 			HashMap<Thread, Long> confAuxIds = state
 					.getVectorClock(state.writeVariableAuxId, getVariable());
 			d_min_across_threads_w = this.getAuxId()
-					- state.getMaxAuxId(W_v, C_t, confAuxIds);
+					- state.getMaxAuxId(W_v, C_t, confAuxIds, this.getThread());
 			d_max_across_threads_w = this.getAuxId()
-					- state.getMinAuxId(W_v, C_t, confAuxIds);
+					- state.getMinAuxId(W_v, C_t, confAuxIds, this.getThread());
 		}
+
 		if (raceDetected) {
 			long d_max = d_max_across_threads_w;
 			if (d_max > 0) {
@@ -156,6 +157,14 @@ public class SHBEvent extends RaceDetectionEvent<SHBState> {
 		return raceDetected;
 	}
 
+	private long min_of_nonzero(long a, long b) {
+		if (a == 0L)
+			return b;
+		if (b == 0L)
+			return a;
+		return a > b ? b : a;
+	}
+
 	@Override
 	public boolean HandleSubWrite(SHBState state, int verbosity) {
 		boolean raceDetected = false;
@@ -172,9 +181,9 @@ public class SHBEvent extends RaceDetectionEvent<SHBState> {
 			HashMap<Thread, Long> confAuxIds = state
 					.getVectorClock(state.readVariableAuxId, getVariable());
 			d_min_across_threads_r = this.getAuxId()
-					- state.getMaxAuxId(R_v, C_t, confAuxIds);
+					- state.getMaxAuxId(R_v, C_t, confAuxIds, this.getThread());
 			d_max_across_threads_r = this.getAuxId()
-					- state.getMinAuxId(R_v, C_t, confAuxIds);
+					- state.getMinAuxId(R_v, C_t, confAuxIds, this.getThread());
 		}
 		long d_min_across_threads_w = 0;
 		long d_max_across_threads_w = 0;
@@ -183,9 +192,9 @@ public class SHBEvent extends RaceDetectionEvent<SHBState> {
 			HashMap<Thread, Long> confAuxIds = state
 					.getVectorClock(state.writeVariableAuxId, getVariable());
 			d_min_across_threads_w = this.getAuxId()
-					- state.getMaxAuxId(W_v, C_t, confAuxIds);
+					- state.getMaxAuxId(W_v, C_t, confAuxIds, this.getThread());
 			d_max_across_threads_w = this.getAuxId()
-					- state.getMinAuxId(W_v, C_t, confAuxIds);
+					- state.getMinAuxId(W_v, C_t, confAuxIds, this.getThread());
 		}
 		if (raceDetected) {
 			long d_max = (d_max_across_threads_r > d_max_across_threads_w)
@@ -198,9 +207,7 @@ public class SHBEvent extends RaceDetectionEvent<SHBState> {
 			}
 			state.sumMaxDistance = state.sumMaxDistance + d_max;
 
-			long d_min = (d_min_across_threads_r < d_min_across_threads_w)
-					? d_min_across_threads_r
-					: d_min_across_threads_w;
+			long d_min = min_of_nonzero(d_min_across_threads_r, d_min_across_threads_w);
 			if (d_min > 0) {
 				if (state.maxMinDistance < d_min) {
 					state.maxMinDistance = d_min;
@@ -209,8 +216,6 @@ public class SHBEvent extends RaceDetectionEvent<SHBState> {
 			}
 			state.numRaces = state.numRaces + 1;
 		}
-
-//		this.printRaceInfo(state);
 
 		int c_t_t = state.getIndex(C_t, this.getThread());
 		state.setIndex(W_v, this.getThread(), c_t_t);

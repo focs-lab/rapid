@@ -28,7 +28,7 @@ public class WCPEvent extends RaceDetectionEvent<WCPState> {
 
 		// Now call child's function
 		boolean toReturn = this.HandleSub(state, verbosity);
-		if(toReturn) {
+		if (toReturn) {
 			state.racyVars.add(this.getVariable().getId());
 		}
 
@@ -300,6 +300,14 @@ public class WCPEvent extends RaceDetectionEvent<WCPState> {
 		return raceDetected;
 	}
 
+	private long min_of_nonzero(long a, long b) {
+		if (a == 0L)
+			return b;
+		if (b == 0L)
+			return a;
+		return a > b ? b : a;
+	}
+
 	@Override
 	public boolean HandleSubWrite(WCPState state, int verbosity) {
 
@@ -387,9 +395,7 @@ public class WCPEvent extends RaceDetectionEvent<WCPState> {
 			}
 			state.sumMaxDistance = state.sumMaxDistance + d_max;
 
-			long d_min = (d_min_across_threads_r < d_min_across_threads_w)
-					? d_min_across_threads_r
-					: d_min_across_threads_w;
+			long d_min = min_of_nonzero(d_min_across_threads_r, d_min_across_threads_w);
 			if (d_min > 0) {
 				if (state.maxMinDistance < d_min) {
 					state.maxMinDistance = d_min;

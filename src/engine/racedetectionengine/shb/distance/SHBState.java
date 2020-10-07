@@ -28,22 +28,22 @@ public class SHBState extends State {
 	public ArrayList<VectorClock> writeVariable;
 	public ArrayList<VectorClock> lastWriteVariable;
 
-	//Book-keeping the last-write's location
+	// Book-keeping the last-write's location
 	public ArrayList<Integer> lastWriteVariableLocId;
 
 	// Distance stats
 	public ArrayList<HashMap<Thread, Long>> readVariableAuxId;
 	public ArrayList<HashMap<Thread, Long>> writeVariableAuxId;
-	
+
 	// == stats ==
 	public long maxMaxDistance = 0;
 	public long sumMaxDistance = 0;
 	public long maxMinDistance = 0;
 	public long sumMinDistance = 0;
 	public long numRaces = 0;
-	public HashSet<Integer> racyVars = new HashSet<Integer> ();
+	public HashSet<Integer> racyVars = new HashSet<Integer>();
 
-	//parameter flags
+	// parameter flags
 	public boolean forceOrder;
 	public boolean tickClockOnAccess;
 
@@ -58,9 +58,9 @@ public class SHBState extends State {
 		Iterator<Thread> tIter = tSet.iterator();
 		while (tIter.hasNext()) {
 			Thread thread = tIter.next();
-			//System.out.println("Adding thread to map " + thread.toString());
-			this.threadToIndex.put(thread, (Integer)this.numThreads);
-			this.numThreads ++;
+			// System.out.println("Adding thread to map " + thread.toString());
+			this.threadToIndex.put(thread, (Integer) this.numThreads);
+			this.numThreads++;
 		}
 
 		this.lockToIndex = new HashMap<Lock, Integer>();
@@ -69,7 +69,8 @@ public class SHBState extends State {
 		this.numVariables = 0;
 	}
 
-	private void initialize1DArrayOfVectorClocksWithBottom(ArrayList<VectorClock> arr, int len) {
+	private void initialize1DArrayOfVectorClocksWithBottom(ArrayList<VectorClock> arr,
+			int len) {
 		for (int i = 0; i < len; i++) {
 			arr.add(new VectorClock(this.numThreads));
 		}
@@ -79,7 +80,7 @@ public class SHBState extends State {
 
 		// initialize clockThread
 		this.clockThread = new ArrayList<VectorClock>();
-		initialize1DArrayOfVectorClocksWithBottom(this.clockThread, this.numThreads);		
+		initialize1DArrayOfVectorClocksWithBottom(this.clockThread, this.numThreads);
 		for (int i = 0; i < this.numThreads; i++) {
 			VectorClock C_t = this.clockThread.get(i);
 			C_t.setClockIndex(i, 1);
@@ -97,12 +98,12 @@ public class SHBState extends State {
 		// initialize lastWriteVariable
 		this.lastWriteVariable = new ArrayList<VectorClock>();
 
-		//initialize locationIds
-		this.lastWriteVariableLocId = new ArrayList<Integer> ();
+		// initialize locationIds
+		this.lastWriteVariableLocId = new ArrayList<Integer>();
 
 		// distance stats
-		this.readVariableAuxId = new ArrayList<HashMap<Thread, Long>> ();
-		this.writeVariableAuxId = new ArrayList<HashMap<Thread, Long>> ();
+		this.readVariableAuxId = new ArrayList<HashMap<Thread, Long>>();
+		this.writeVariableAuxId = new ArrayList<HashMap<Thread, Long>>();
 	}
 
 	// Access methods
@@ -113,28 +114,27 @@ public class SHBState extends State {
 		return arr.get(index);
 	}
 
-
-	private int checkAndAddLock(Lock l){
-		if(!lockToIndex.containsKey(l)){
-			//System.err.println("New lock found " + this.numLocks);
+	private int checkAndAddLock(Lock l) {
+		if (!lockToIndex.containsKey(l)) {
+			// System.err.println("New lock found " + this.numLocks);
 			lockToIndex.put(l, this.numLocks);
-			this.numLocks ++;
+			this.numLocks++;
 
 			lastReleaseLock.add(new VectorClock(this.numThreads));
 		}
 		return lockToIndex.get(l);
 	}
 
-	private int checkAndAddVariable(Variable v){
-		if(!variableToIndex.containsKey(v)){
+	private int checkAndAddVariable(Variable v) {
+		if (!variableToIndex.containsKey(v)) {
 			variableToIndex.put(v, this.numVariables);
-			this.numVariables ++;
-			readVariable			.add(new VectorClock(this.numThreads));
-			writeVariable			.add(new VectorClock(this.numThreads));
-			lastWriteVariable		.add(new VectorClock(this.numThreads));
-			lastWriteVariableLocId	.add(-1); //Initialize loc id's to be -1
-			readVariableAuxId		.add(new HashMap<Thread, Long> ());
-			writeVariableAuxId		.add(new HashMap<Thread, Long> ());
+			this.numVariables++;
+			readVariable.add(new VectorClock(this.numThreads));
+			writeVariable.add(new VectorClock(this.numThreads));
+			lastWriteVariable.add(new VectorClock(this.numThreads));
+			lastWriteVariableLocId.add(-1); // Initialize loc id's to be -1
+			readVariableAuxId.add(new HashMap<Thread, Long>());
+			writeVariableAuxId.add(new HashMap<Thread, Long>());
 		}
 		return variableToIndex.get(v);
 	}
@@ -161,29 +161,29 @@ public class SHBState extends State {
 		return getVectorClockFrom1DArray(arr, vIndex);
 	}
 
-	public int getLWLocId(Variable v){
+	public int getLWLocId(Variable v) {
 		int vIndex = checkAndAddVariable(v);
 		return this.lastWriteVariableLocId.get(vIndex);
 	}
 
-	public void setLWLocId(Variable v, int loc){
+	public void setLWLocId(Variable v, int loc) {
 		int vIndex = checkAndAddVariable(v);
 		this.lastWriteVariableLocId.set(vIndex, loc);
 	}
 
-	public void setIndex(VectorClock vc, Thread t, int val){
+	public void setIndex(VectorClock vc, Thread t, int val) {
 		int tIndex = threadToIndex.get(t);
 		vc.setClockIndex(tIndex, val);
 	}
 
-	public int getIndex(VectorClock vc, Thread t){
+	public int getIndex(VectorClock vc, Thread t) {
 		int tIndex = threadToIndex.get(t);
 		return vc.getClockIndex(tIndex);
 	}
 
-	public void printThreadClock(){
+	public void printThreadClock() {
 		ArrayList<VectorClock> printVC = new ArrayList<VectorClock>();
-		for(Thread thread : threadToIndex.keySet()){
+		for (Thread thread : threadToIndex.keySet()) {
 			VectorClock C_t = getVectorClock(clockThread, thread);
 			printVC.add(C_t);
 		}
@@ -192,14 +192,18 @@ public class SHBState extends State {
 		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 	}
 
-	public long getMaxAuxId(VectorClock confVC, VectorClock currVC, HashMap<Thread, Long> auxId_conf) {
+	public long getMaxAuxId(VectorClock confVC, VectorClock currVC,
+			HashMap<Thread, Long> auxId_conf, Thread excludeThread) {
 		long maxId = -1;
-		for(Thread t: auxId_conf.keySet()) {
+		for (Thread t : auxId_conf.keySet()) {
+			if (t.equals(excludeThread)) {
+				continue;
+			}
 			int tIndex_conf = getIndex(confVC, t);
 			int tIndex_curr = getIndex(currVC, t);
-			if(tIndex_conf > tIndex_curr) {
+			if (tIndex_conf > tIndex_curr) {
 				long auxId_VC = auxId_conf.get(t);
-				if(maxId < auxId_VC) {
+				if (maxId < auxId_VC) {
 					maxId = auxId_VC;
 				}
 			}
@@ -207,35 +211,38 @@ public class SHBState extends State {
 		return maxId;
 	}
 
-	public long getMinAuxId(VectorClock confVC, VectorClock currVC, HashMap<Thread, Long> auxId_conf) {
+	public long getMinAuxId(VectorClock confVC, VectorClock currVC,
+			HashMap<Thread, Long> auxId_conf, Thread excludeThread) {
 		long minId = -1;
-		for(Thread t: auxId_conf.keySet()) {
+		for (Thread t : auxId_conf.keySet()) {
+			if (t.equals(excludeThread)) {
+				continue;
+			}
 			int tIndex_conf = getIndex(confVC, t);
 			int tIndex_curr = getIndex(currVC, t);
-			if(tIndex_conf > tIndex_curr) {
+			if (tIndex_conf > tIndex_curr) {
 				long auxId_VC = auxId_conf.get(t);
-				if(minId == -1) {
+				if (minId == -1) {
 					minId = auxId_VC;
-				}
-				else {
-					if(minId > auxId_VC) {
+				} else {
+					if (minId > auxId_VC) {
 						minId = auxId_VC;
 					}
 				}
-				
+
 			}
 		}
 		return minId;
 	}
 
-
-	public boolean isThreadRelevant(Thread t){
+	public boolean isThreadRelevant(Thread t) {
 		return this.threadToIndex.containsKey(t);
 	}
 
-	public void printMemory(){
+	public void printMemory() {
 		System.err.println("Number of threads = " + Integer.toString(this.numThreads));
 		System.err.println("Number of locks = " + Integer.toString(this.numLocks));
-		System.err.println("Number of variables = " + Integer.toString(this.numVariables));
+		System.err
+				.println("Number of variables = " + Integer.toString(this.numVariables));
 	}
 }
