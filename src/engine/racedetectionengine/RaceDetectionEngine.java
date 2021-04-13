@@ -167,10 +167,6 @@ public abstract class RaceDetectionEngine<St extends State, RDE extends RaceDete
 	}
 
 	public void analyzeTraceRR(boolean multipleRace, int verbosity) {
-		Long eventCount = (long) 0;
-		Long raceCount = (long) 0;
-		Long totalSkippedEvents = (long) 0;
-
 		while (rrParser.checkAndGetNext(handlerEvent)) {
 			eventCount = eventCount + 1;
 			if (skipEvent(handlerEvent)) {
