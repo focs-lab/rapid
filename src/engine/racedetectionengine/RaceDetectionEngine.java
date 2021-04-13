@@ -19,6 +19,7 @@ public abstract class RaceDetectionEngine<St extends State, RDE extends RaceDete
 
 	protected long eventCount;
 	protected Long raceCount;
+	protected HashSet<Integer> locIdsOfRacyEvents;
 	protected Long totalSkippedEvents;
 
 	protected boolean enablePrintStatus;
@@ -71,8 +72,14 @@ public abstract class RaceDetectionEngine<St extends State, RDE extends RaceDete
 
 		if (raceDetected) {
 			// raceCount ++;
-			System.out.println(handlerEvent.getLocId());
 
+			if (verbosity >= 1) {
+				System.out.println("Race detected at event " + eventCount + " : "
+						+ handlerEvent.toStandardFormat());
+			} else {
+				System.out.println(handlerEvent.getLocId());
+			}
+			this.locIdsOfRacyEvents.add(handlerEvent.getLocId());
 		}
 		return raceDetected;
 	}
@@ -80,6 +87,7 @@ public abstract class RaceDetectionEngine<St extends State, RDE extends RaceDete
 	public void analyzeTrace(boolean multipleRace, int verbosity) {
 		eventCount = (long) 0;
 		raceCount = (long) 0;
+		locIdsOfRacyEvents = new HashSet<Integer>();
 		totalSkippedEvents = (long) 0;
 		if (this.parserType.isRV()) {
 			analyzeTraceRV(multipleRace, verbosity);
@@ -187,6 +195,8 @@ public abstract class RaceDetectionEngine<St extends State, RDE extends RaceDete
 			System.out.println("Analysis complete");
 			System.out.println(
 					"Number of 'racy' events found = " + Long.toString(raceCount));
+			System.out.println(
+					"Number of 'racy' lines found = " + this.locIdsOfRacyEvents.size());
 		}
 	}
 

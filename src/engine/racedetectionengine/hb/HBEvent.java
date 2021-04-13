@@ -15,7 +15,7 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 	/**************Pretty Printing*******************/
 	@Override
 	public void printRaceInfoLockType(HBState state, int verbosity){
-		if(verbosity == 2){
+		if(verbosity >= 2){
 			String str = "#";
 			str += Integer.toString(getLocId());
 			str += "|";
@@ -33,7 +33,7 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 
 	@Override
 	public void printRaceInfoAccessType(HBState state, int verbosity){
-		if(verbosity == 1 || verbosity == 2){
+		if(verbosity >= 2){
 			String str = "#";
 			str += Integer.toString(getLocId());
 			str += "|";
@@ -51,7 +51,7 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 	
 	@Override
 	public void printRaceInfoExtremeType(HBState state, int verbosity){
-		if(verbosity == 2){
+		if(verbosity >= 2){
 			String str = "#";
 			str += Integer.toString(getLocId());
 			str += "|";

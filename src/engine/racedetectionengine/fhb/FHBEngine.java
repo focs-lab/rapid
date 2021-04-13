@@ -17,7 +17,7 @@ public class FHBEngine extends RaceDetectionEngine<FHBState, FHBEvent>{
 	}
 
 	public void postAnalysis(){
-		System.out.println("Number of race pc pairs = " + Integer.toString(state.getLocPairs().size()));
+//		System.out.println("Number of race pc pairs = " + Integer.toString(state.getLocPairs().size()));
 	}
 	
 	@Override
