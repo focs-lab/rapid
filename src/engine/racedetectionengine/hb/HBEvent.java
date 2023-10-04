@@ -23,7 +23,7 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 			str += "|";
 			str += this.getLock().toString();
 			str += "|";
-			VectorClock C_t = state.generateVectorClockFromClockThread(this.getThread());
+			VectorClock C_t = state.getVectorClock(state.HBThread, this.getThread()); 
 			str += C_t.toString();
 			str += "|";
 			str += this.getThread().getName();
@@ -41,7 +41,7 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 			str += "|";
 			str += this.getVariable().getName();
 			str += "|";
-			VectorClock C_t = state.generateVectorClockFromClockThread(this.getThread());
+			VectorClock C_t = state.getVectorClock(state.HBThread, this.getThread()); 
 			str += C_t.toString();
 			str += "|";
 			str += this.getThread().getName();
@@ -59,7 +59,7 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 			str += "|";
 			str += this.getTarget().toString();
 			str += "|";
-			VectorClock C_t = state.generateVectorClockFromClockThread(this.getThread());
+			VectorClock C_t = state.getVectorClock(state.HBThread, this.getThread()); 
 			str += C_t.toString();
 			str += "|";
 			str += this.getThread().getName();
@@ -71,16 +71,16 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 	/**************Acquire/Release*******************/
 	@Override
 	public boolean HandleSubAcquire(HBState state, int verbosity){
-		VectorClock H_t = state.getVectorClock(state.HBPredecessorThread, this.getThread());
+		VectorClock C_t = state.getVectorClock(state.HBThread, this.getThread()); 
 		VectorClock L_l = state.getVectorClock(state.lastReleaseLock, this.getLock());				
-		H_t.updateWithMax(H_t, L_l);
+		C_t.updateWithMax(C_t, L_l);
 		this.printRaceInfo(state, verbosity);
 		return false;
 	}
 
 	@Override
 	public boolean HandleSubRelease(HBState state, int verbosity) {
-		VectorClock C_t = state.generateVectorClockFromClockThread(this.getThread());				
+		VectorClock C_t = state.getVectorClock(state.HBThread, this.getThread()); 			
 		VectorClock L_l = state.getVectorClock(state.lastReleaseLock, this.getLock());
 		L_l.copyFrom(C_t);
 		state.incClockThread(getThread());
@@ -94,7 +94,7 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 	public boolean HandleSubRead(HBState state, int verbosity) {
 
 		boolean raceDetected = false;
-		VectorClock C_t = state.generateVectorClockFromClockThread(this.getThread());
+		VectorClock C_t = state.getVectorClock(state.HBThread, this.getThread()); 
 		VectorClock R_v = state.getVectorClock(state.readVariable, getVariable());
 		VectorClock W_v = state.getVectorClock(state.writeVariable, getVariable());
 
@@ -113,7 +113,7 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 	public boolean HandleSubWrite(HBState state, int verbosity) {
 
 		boolean raceDetected = false;
-		VectorClock C_t = state.generateVectorClockFromClockThread(this.getThread());
+		VectorClock C_t = state.getVectorClock(state.HBThread, this.getThread()); 
 		VectorClock R_v = state.getVectorClock(state.readVariable, getVariable());
 		VectorClock W_v = state.getVectorClock(state.writeVariable, getVariable());
 
@@ -136,10 +136,9 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 	@Override
 	public boolean HandleSubFork(HBState state,int verbosity) {
 		if (state.isThreadRelevant(this.getTarget())) {
-			VectorClock C_t = state.generateVectorClockFromClockThread(this.getThread());			
-			VectorClock H_tc = state.getVectorClock(state.HBPredecessorThread, this.getTarget());
-			// System.out.println("Fork : Setting HB of target");
-			H_tc.copyFrom(C_t);
+			VectorClock C_t = state.getVectorClock(state.HBThread, this.getThread()); 			
+			VectorClock C_tc = state.getVectorClock(state.HBThread, this.getTarget()); 
+			C_tc.updateWithMax(C_tc, C_t);
 			state.incClockThread(this.getThread());
 			this.printRaceInfo(state, verbosity);
 		}
@@ -149,9 +148,9 @@ public class HBEvent extends RaceDetectionEvent<HBState> {
 	@Override
 	public boolean HandleSubJoin(HBState state,int verbosity) {
 		if (state.isThreadRelevant(this.getTarget())) {
-			VectorClock H_t = state.getVectorClock(state.HBPredecessorThread, this.getThread());
-			VectorClock C_tc = state.generateVectorClockFromClockThread(this.getTarget());
-			H_t.updateWithMax(H_t, C_tc);
+			VectorClock C_t = state.getVectorClock(state.HBThread, this.getThread()); 
+			VectorClock C_tc = state.getVectorClock(state.HBThread, this.getTarget()); 
+			C_t.updateWithMax(C_t, C_tc);
 			this.printRaceInfo(state, verbosity);
 		}
 		return false;

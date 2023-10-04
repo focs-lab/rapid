@@ -22,9 +22,7 @@ public class HBState extends State{
 	private int numVariables;
 
 	// Data used for algorithm
-	private ArrayList<Integer> clockThread;
-	private ArrayList<VectorClock> HBThread;
-	public ArrayList<VectorClock> HBPredecessorThread;
+	public ArrayList<VectorClock> HBThread;
 	public ArrayList<VectorClock> lastReleaseLock;
 	public ArrayList<VectorClock> readVariable;
 	public ArrayList<VectorClock> writeVariable;
@@ -51,19 +49,12 @@ public class HBState extends State{
 	}
 
 	public void initData(HashSet<Thread> tSet) {
-		// Initialize clockThread
-		this.clockThread = new ArrayList<Integer>();
-		for (int i = 0; i < this.numThreads; i++) {
-			this.clockThread.add((Integer)1);
-		}
-		
 		// initialize HBThread
 		this.HBThread = new ArrayList<VectorClock>();
 		initialize1DArrayOfVectorClocksWithBottom(this.HBThread, this.numThreads, this.numThreads);
-
-		// initialize HBPredecessorThread
-		this.HBPredecessorThread = new ArrayList<VectorClock>();
-		initialize1DArrayOfVectorClocksWithBottom(this.HBPredecessorThread, this.numThreads, this.numThreads);
+		for(int i=0; i < this.numThreads; i++){
+			this.HBThread.get(i).setClockIndex(i, 1);
+		}
 
 		// initialize lastReleaseLock
 		this.lastReleaseLock = new ArrayList<VectorClock>();
@@ -104,7 +95,7 @@ public class HBState extends State{
 
 	public int getClockThread(Thread t) {
 		int tIndex = threadToIndex.get(t);
-		return clockThread.get(tIndex);
+		return this.HBThread.get(tIndex).getClockIndex(tIndex);
 	}
 	
 	public VectorClock getVectorClockFrom1DArray(ArrayList<VectorClock> arr, int index) {
@@ -113,22 +104,11 @@ public class HBState extends State{
 		}
 		return arr.get(index);
 	}
-	
-	public VectorClock generateVectorClockFromClockThread(Thread t) {
-		int tIndex = threadToIndex.get(t);
-		VectorClock hbClock = getVectorClock(HBThread, t);
-		VectorClock pred = getVectorClock(HBPredecessorThread, t);
-		int tValue = getClockThread(t);
-		
-		hbClock.copyFrom(pred);
-		hbClock.setClockIndex(tIndex, tValue);
-		return hbClock;
-	}
 
 	public void incClockThread(Thread t) {
 		int tIndex = threadToIndex.get(t);
-		int origVal = clockThread.get(tIndex);
-		clockThread.set(tIndex, (Integer)(origVal + 1));
+		int origVal = this.HBThread.get(tIndex).getClockIndex(tIndex);
+		this.HBThread.get(tIndex).setClockIndex(tIndex, (Integer)(origVal + 1));
 	}
 
 	public VectorClock getVectorClock(ArrayList<VectorClock> arr, Thread t) {
@@ -149,7 +129,7 @@ public class HBState extends State{
 	public void printThreadClock(){
 		ArrayList<VectorClock> printVC = new ArrayList<VectorClock>();
 		for(Thread thread : threadToIndex.keySet()){
-			VectorClock C_t = generateVectorClockFromClockThread(thread);
+			VectorClock C_t = getVectorClock(this.HBThread, thread);
 			printVC.add(C_t);
 		}
 		System.out.println(printVC);
