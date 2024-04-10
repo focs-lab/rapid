@@ -139,14 +139,28 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 			}
 		}
 		
-		state.staleReads.get(v).add(t);
-
-		state.updateSetAtRead(t, v);
-		
 		if(!state.transactionIsActive(t)){
 			state.incClockThread(t);
+			
+			// Now update R_v and ChR_v pro-actively instead of adding t in staleReads.
+			VectorClockOpt R_v = state.getVectorClock(state.clockReadVariable, v);
+			VectorClockOpt chR_v = state.getVectorClock(state.clockReadVariableCheck, v);	
+			VectorClockOpt C_t = state.getVectorClock(state.clockThread, t);
+			R_v.updateWithMax(R_v, C_t);
+			state.updateCheckClock(chR_v, C_t, t);
 		}
-
+		else {
+			// Here we can add t to staleReads since all the reads 
+			// in the current active transactions should be updated 
+			// using the same clock, namely the current value of C_t.
+			// In the worst case, R_c and chR_v will be updated when 
+			// the current transaction ends.
+			state.staleReads.get(v).add(t);
+			
+		}
+		
+		state.updateSetAtRead(t, v);
+		
 		return violationDetected;
 	}
 
@@ -156,6 +170,7 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 		Thread t = this.getThread();
 		Variable v = this.getVariable();
 		state.checkAndAddVariable(v);
+		VectorClockOpt W_v = state.getVectorClock(state.clockWriteVariable, v);
 					
 		if(state.lastThreadToWrite.containsKey(v)) {
 			Thread last_writer = state.lastThreadToWrite.get(v);
@@ -165,20 +180,19 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 					violationDetected |= state.checkAndGetClock(C_last_writer, C_last_writer, t);
 				}
 				else {
-					VectorClockOpt W_v = state.getVectorClock(state.clockWriteVariable, v);
 					violationDetected |= state.checkAndGetClock(W_v, W_v, t);
 				}
 			}
 		}
+		
 				
 		state.getReadClocksFromStaleThreads(v);
 				
 		VectorClockOpt R_v = state.getVectorClock(state.clockReadVariable, v);
 		VectorClockOpt chR_v = state.getVectorClock(state.clockReadVariableCheck, v);
-		
+				
 		violationDetected |= state.checkAndGetClock(chR_v, R_v, t);
 		
-		state.staleWrites.add(v);
 	
 		state.lastThreadToWrite.put(v, t);
 
@@ -186,8 +200,20 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 				
 		if(!state.transactionIsActive(t)){
 			state.incClockThread(t);
+			
+			// Now update W_v pro-actively instead of adding x in staleWrites.
+			VectorClockOpt C_t = state.getVectorClock(state.clockThread, t);
+			W_v.updateWithMax(W_v, C_t);
 		}
-
+		else {
+			// Here we can add x to staleWrites since all the writes 
+			// in the current active transaction should be updated 
+			// using the same clock, namely the current value of C_t.
+			// In the worst case, W_x will be updated when the current
+			// transaction ends.
+			state.staleWrites.add(v);
+		}
+		
 		return violationDetected;
 	}
 
@@ -240,6 +266,7 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 		// else Treat this as a no-op
 		
 		state.incrementNestingDepth(t);
+				
 		return violationDetected;
 	}
 
