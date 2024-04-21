@@ -204,6 +204,7 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 			// Now update W_v pro-actively instead of adding x in staleWrites.
 			VectorClockOpt C_t = state.getVectorClock(state.clockThread, t);
 			W_v.updateWithMax(W_v, C_t);
+			state.staleWrites.remove(v);
 		}
 		else {
 			// Here we can add x to staleWrites since all the writes 
