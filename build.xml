@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="rapid">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="../../eclipse/java-neon/Eclipse.app/Contents/Eclipse/"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+    <path id="rapid.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/rvparse.jar"/>
+        <pathelement location="lib/lz4-1.3-SNAPSHOT.jar"/>
+        <pathelement location="lib/parserv.jar"/>
+        <pathelement location="lib/jgrapht/antlr4-runtime-4.7.1.jar"/>
+        <pathelement location="lib/jgrapht/commons-lang3-3.8.1.jar"/>
+        <pathelement location="lib/jgrapht/commons-text-1.5.jar"/>
+        <pathelement location="lib/jgrapht/fastutil-8.2.2.jar"/>
+        <pathelement location="lib/jgrapht/guava-26.0-jre.jar"/>
+        <pathelement location="lib/jgrapht/jgrapht-bundle-1.3.0.jar"/>
+        <pathelement location="lib/jgrapht/jgrapht-core-1.3.0.jar"/>
+        <pathelement location="lib/jgrapht/jgrapht-demo-1.3.0.jar"/>
+        <pathelement location="lib/jgrapht/jgrapht-ext-1.3.0.jar"/>
+        <pathelement location="lib/jgrapht/jgrapht-guava-1.3.0.jar"/>
+        <pathelement location="lib/jgrapht/jgrapht-io-1.3.0.jar"/>
+        <pathelement location="lib/jgrapht/jgrapht-opt-1.3.0.jar"/>
+        <pathelement location="lib/jgrapht/jgraphx-3.4.1.3.jar"/>
+        <pathelement location="lib/jgrapht/jheaps-0.9.jar"/>
+        <pathelement location="lib/commons-cli-1.3.1.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+                <exclude name="notes/"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <exclude name="notes/"/>
+            <classpath refid="rapid.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+	<target description="Create a jar file." name="jar" depends="init,build">
+	  <jar basedir="bin" destfile="rapid.jar">
+		<manifest>
+		  <attribute name="Built-By" value="${builder}" />
+		  <attribute name="Built-On" value="${build-info.current-date}" />
+		  <attribute name="Built-At" value="${build-info.current-time}" />
+		</manifest>
+	  </jar>
+	</target>
+</project>
