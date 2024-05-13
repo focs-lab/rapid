@@ -74,7 +74,6 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         eventInfo.auxId = this.getAuxId();
         ArrayList<AcqEventInfo> curAcqList = state.acqList.get(lockId)[threadId];
 
-        // check fork-join requests
         this.onExistForkEvent(state, threadId);
 
         this.updateTLClosure(state);
@@ -103,8 +102,6 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
 
         this.updateTLClosure(state);
 
-
-        // update in-thread id and auxId
         int curThCnt = state.threadIdToCnt[threadId];
         curThCnt++;
         relEventInfo.inThreadId = curThCnt;
@@ -133,7 +130,6 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         accessEventInfo.auxId = this.getAuxId();
         accessEventInfo.location = this.getLocId();
 
-        // check fork-join requests
         this.onExistForkEvent(state, threadIdx);
         accessEventInfo.prevTLC = new VectorClock(state.clockThread[threadIdx]);
 
@@ -144,7 +140,6 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         accessEventInfo.inThreadId = curThCnt;
         state.threadIdToCnt[threadIdx] = curThCnt;
 
-        // add entry for last-write map
         VectorClock lastWriteTLC = state.recentWriteMap.get(v.getId());
 
         if (lastWriteTLC != null) {
@@ -170,7 +165,6 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         accessEventInfo.auxId = this.getAuxId();
         accessEventInfo.location = this.getLocId();
 
-        // check fork-join requests
         this.onExistForkEvent(state, threadIdx);
 
         accessEventInfo.prevTLC = new VectorClock(state.clockThread[threadIdx]);
@@ -183,12 +177,9 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         accessEventInfo.inThreadId = curThCnt;
         state.threadIdToCnt[threadIdx] = curThCnt;
 
-        // update ConfClosure
         VectorClock recentWriteTLC = state.recentWriteMap.get(v.getId());
         VectorClock prevTLC = state.clockThread[threadIdx];
 
-
-        // update recentWriteMap
         recentWriteTLC.copyFrom(prevTLC);
 
         return checkWrite(state, verbosity, accessEventInfo);
@@ -196,22 +187,16 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
 
     @Override
     public boolean HandleSubFork(OSRState state, int verbosity) {
-        // add fork request
         int targetThId = this.getTarget().getId();
-
-        // Initialize TLClosure of current event e to be the TlClosure(prev(e)) + e
         int threadIdx = this.getThread().getId();
 
-        // check fork-join requests
         this.onExistForkEvent(state, threadIdx);
-
         this.updateTLClosure(state);
 
         int curThCnt = state.threadIdToCnt[threadIdx];
         curThCnt++;
         state.threadIdToCnt[threadIdx] = curThCnt;
 
-        // add fork event to the target thread
         VectorClock forkTLC = new VectorClock(state.clockThread[threadIdx]);
         state.threadToForkEvent[targetThId] = forkTLC;
         return false;
@@ -221,26 +206,18 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
     public boolean HandleSubJoin(OSRState state, int verbosity) {
         Thread target = this.target;
         int targetThreadId = target.getId();
-
-        // Initialize TLClosure of current event e to be the TlClosure(prev(e)) + e
         int threadIdx = this.getThread().getId();
-
-        // check fork-join requests
         this.onExistForkEvent(state, threadIdx);
-
         this.updateTLClosure(state);
-
 
         int curThCnt = state.threadIdToCnt[threadIdx];
         curThCnt++;
         state.threadIdToCnt[threadIdx] = curThCnt;
 
-        // update ConfClosure and TLClosure
         VectorClock prevTLC = state.clockThread[threadIdx];
         VectorClock targetTLC = state.clockThread[targetThreadId];
 
         prevTLC.updateWithMax(prevTLC, targetTLC);
-
         return false;
     }
 
@@ -275,21 +252,16 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
 
             int start = binarySearchByTLC(state, eventsInTh, e2, thId);
 
-            // update with prev(e2) or fork event of e2
             state.osrEventSet.updateWithMax(state.osrEventSet, e2.prevTLC);
 
             for (int pos = start; pos < eventsInTh.size(); pos++) {
                 AccessEventInfo e1 = eventsInTh.get(pos);
 
                 if(checkEventInVectorstamp(state.osrEventSet, e1, thId)){
-                    // e1 \in OSR set, should increase e1 till e1 \notin OSR
                     continue;
                 }
 
                 if (checkRace(e1, e2, thId, this.getThread().getId(), state)) {
-//                    System.out.println("race between " + e1.auxId + ", " + e2.auxId);
-//                    updateRaceDistances(state, e1.auxId, e2.auxId);
-//                    System.out.println("OSR set between " + e1.auxId + ", " + e2.auxId + " " + state.osrEventSet);
                     state.racyEvents.add(e2.auxId);
                     state.racyLocations.add(e2.location);
                     reInit(state);
@@ -297,7 +269,6 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
                 }
             }
 
-            // re-init data structures that are modified during checkRace
             reInit(state);
         }
         return false;
@@ -320,7 +291,6 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
             int readsLimit = readsInTh.size();
             int writesLimit = writesInTh.size();
 
-            // update with prev(e2) or fork event of e2
             state.osrEventSet.updateWithMax(state.osrEventSet, e2.prevTLC);
             boolean isE1Read;
             AccessEventInfo e1;
@@ -347,18 +317,13 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
                 }
 
                 if (checkRace(e1, e2, thId, this.getThread().getId(), state)) {
-//                    System.out.println("race between " + e1.auxId + ", " + e2.auxId);
-//                    updateRaceDistances(state, e1.auxId, e2.auxId);
-//                    System.out.println("OSR set between " + e1.auxId + ", " + e2.auxId + " " + state.osrEventSet);
                     state.racyLocations.add(e2.location);
                     state.racyEvents.add(e2.auxId);
                     reInit(state);
-
                     return true;
                 }
             }
 
-            // re-init data structures that are modified during checkRace
             reInit(state);
         }
         return false;
@@ -403,17 +368,13 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
     }
 
 
-    // given e1 and e2, check whether they are races
     public boolean checkRace(AccessEventInfo e1, AccessEventInfo e2, int e1ThId, int e2ThId, OSRState state) {
-        // e1 -> curr event   e2 -> cmp event
-        calcOSR(e1, e2, e1ThId, e2ThId, state); // state.osrEventSet has been updated
+        calcOSR(e1, e2, e1ThId, e2ThId, state);
 
-        // if e1 in OSR return false, e2 will never be in OSR
         if (checkEventInVectorstamp(state.osrEventSet, e1, e1ThId)) {
             return false;
         }
 
-        // feasibility check
         if (!checkOpenAcquires(state)) {
             return false;
         }
@@ -422,20 +383,14 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
 
         boolean hasCycle = this.buildGraph(state, backwardEdges, e1, e2, e1ThId, e2ThId);
 
-//        if(!hasCycle) {
-//            System.out.println("graph size = " + state.graph.vertexSet().size() / 2);
-//        }
-
         return !hasCycle;
     }
 
     public boolean buildGraph(OSRState state, List<Triplet<Integer, AcqEventInfo, Integer>> backwardEdges,
                               AccessEventInfo e1, AccessEventInfo e2, int e1ThId, int e2ThId){
-        // backwardEdge = <lockId, acqO, thId of acqO>
         List<Triplet<Integer, Integer, Long>> nodes = new ArrayList<>(); // <thId, inThreadId-1, auxId>
         SimpleDirectedGraph<Long, DefaultEdge> graph = new SimpleDirectedGraph<>(DefaultEdge.class);
 
-        // add nodes and backward edges into the graph
         for(Triplet<Integer, AcqEventInfo, Integer> backwardEdge : backwardEdges){
             int lockId = backwardEdge.first;
             long acqOAuxId = backwardEdge.second.auxId;
@@ -450,10 +405,8 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
             graph.addEdge(lastRelAuxId, acqOAuxId);
         }
 
-//        System.out.println(nodes);
         List<VectorClock> vectorClocks = state.partialOrder.queryForEventLists(nodes, state.osrEventSet, state.inThreadIdToAuxId);
 
-        // add forward edges
         for (int i=0; i < nodes.size(); i++) {
             Triplet<Integer, Integer, Long> curNode = nodes.get(i);
             VectorClock vc = vectorClocks.get(i);
@@ -461,14 +414,13 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
             for (int j=0; j<nodes.size(); j++){
                 if(i == j) continue;
 
-                Triplet<Integer, Integer, Long> testNode = nodes.get(j); // <thId, inThId, auxId>
+                Triplet<Integer, Integer, Long> testNode = nodes.get(j);
 
                 if(testNode.first.intValue() == curNode.first.intValue()) {
                     if (testNode.second > curNode.second) {
                         graph.addEdge(curNode.third, testNode.third);
                     }
                 } else if (vc.getClockIndex(testNode.first) != -1 && testNode.second >= vc.getClockIndex(testNode.first)) {
-//                    System.out.println("add edge : " + curNode.third + " -> " + testNode.third);
                     graph.addEdge(curNode.third, testNode.third);
                 }
             }
@@ -483,30 +435,23 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
 
 
     public void calcOSR(AccessEventInfo e1, AccessEventInfo e2, int e1ThId, int e2ThId, OSRState state) {
-        // e1 -> cmp event   e2 -> curr event
         state.osrEventSet.updateWithMax(state.osrEventSet, e1.prevTLC);
 
-        //e1 in TLC(prev(e2)), no race from e2 onwards
         if (checkEventInVectorstamp(state.osrEventSet, e1, e1ThId)) {
             return;
         }
 
-        // repeat updating OSR
         boolean hasChanged = true;
 
         while (hasChanged) {
             hasChanged = false;
-            // add acq events from acqList
             for (Lock l : state.locks) {
                 int lockId = l.getId();
                 boolean[] openAcq = state.openAcquiresExist.get(lockId);
                 int[] curAcqListPtrs = state.acqListPtr.get(lockId);
 
                 for (int thId=0; thId<state.numThreads; thId++) {
-
                     ArrayList<AcqEventInfo> acqs = state.acqList.get(lockId)[thId];
-
-                    // get current ptr;  if pointing to the end, skip this loop
                     int ptr = curAcqListPtrs[thId];
 
                     if (ptr >= acqs.size()) continue;
@@ -527,16 +472,12 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
 
                         if(curRelEvent == null || checkEventInVectorstamp(curRelEvent.TLClosure, e1, e1ThId)
                                 || checkEventInVectorstamp(curRelEvent.TLClosure, e2, e2ThId)) {
-                            // cannot be added, i.e. Open Acquire
-
                             hasOpenAcq = true;
                             break;
                         } else {
-                            // curRelEvent can be added into OSR
                             hasOpenAcq = false;
                             toUpdateRelEvent = curRelEvent;
                         }
-
                         ptr++;
                     }
 
@@ -550,7 +491,6 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
                             state.recentRelMapAlgo.put(lockId, toUpdateRelEvent);
                             state.recentRelThreadId.put(lockId, thId);
                         }
-
                         hasChanged = true;
                     }
                     curAcqListPtrs[thId] = ptr;
@@ -567,9 +507,6 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
                 }
             }
         }
-
-//        System.out.println("OSR[" + e1.getAuxId() + ", " + e2.getAuxId()
-//                + "] : " + ret);
     }
 
     public void reInit(OSRState state) {
@@ -594,13 +531,10 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
     }
 
     private List<Triplet<Integer, AcqEventInfo, Integer>> getAllBackwardEdges(OSRState state) {
-        // return a list of backward edges in OSR set
-        // A backward edge = <lockId, acqO, thId of acqO>
         List<Triplet<Integer, AcqEventInfo, Integer>> ret = new ArrayList<>();
 
         for (Lock l : state.locks) {
             int lockId = l.getId();
-            // recent rel(l) = null => no backward edge
             RelEventInfo recentRelEvent = state.recentRelMapAlgo.get(lockId);
             if (recentRelEvent == null) continue;
 
@@ -619,12 +553,8 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
                         Triplet<Integer, AcqEventInfo, Integer> curPair = new Triplet<>(lockId, acqO_Event, thId);
                         ret.add(curPair);
                     }
-                    // previous feasibility check already makes sure there is at most 1 open acq for each lock
-                    // therefore, if there is an open acq in curr thread, no matter it's backward edge or not
-                    // We can directly break and jump to check the next lock
                     break;
                 }
-                // no need to check for (second - first > 1), it's done in checkBadAcquires()
             }
         }
         return ret;

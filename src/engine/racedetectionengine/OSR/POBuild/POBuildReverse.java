@@ -37,9 +37,13 @@ public class POBuildReverse {
 
     public POBuildReverse(){}
 
-    public POBuildReverse(String traceDir) throws IOException {
+    public POBuildReverse(String traceDir) {
         this.traceDir = traceDir;
-        this.totalNumEvents = Files.lines(Paths.get(this.traceDir)).count();
+        try {
+            this.totalNumEvents = Files.lines(Paths.get(this.traceDir)).count();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         this.totalEventsSeen = 0L;
 
         this.varNameToThreads = new HashMap<>();

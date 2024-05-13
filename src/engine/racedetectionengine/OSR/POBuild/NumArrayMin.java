@@ -118,8 +118,6 @@ public class NumArrayMin {
 			} else {
 				right = mid - 1;
 			}
-
-//			System.out.println("left : " + left + ", " + right + ", " + mid);
 		}
 
 		return left;
@@ -150,24 +148,16 @@ public class NumArrayMin {
 					return 0;
 				}
 			}
-
-//			System.out.println("right : " + left + ", " + right + ", " + mid);
 		}
 
 		return left;
 	}
 
 	public int sumRange(int i, int j) {
-
 		if(this.nums.size() == 0) return -1;
-
-//		this.printArray();
 
 		int right = searchIndexLeft(i);
 		int left = searchIndexRight(j);
-
-//		System.out.println("input : " + i + ", " + j);
-//		System.out.println("query : " + left + ", " + right);
 
 		if(left < 0 || right >= this.nums.size() || left > right) return -1;
 
@@ -194,7 +184,6 @@ public class NumArrayMin {
 			}  else {
 				int l = sumRange(root.left, start, mid);
 				int r = sumRange(root.right, mid+1, end);
-
 
 				return  l < r ? l : r ;
 			}
