@@ -3,15 +3,15 @@ package util;
 
 
 public final class PairHardCodeWordTricks{
-	
-//The arrangement is PCLOCK - CLOCK
+
+	//The arrangement is PCLOCK - CLOCK
 	public static final int CLOCK_BITS = 32;
 	public static final int PCLOCK_BITS = 32;
 	public static final long ALL_ONES_LONG = -1;
 	public static final long PCLOCK_MASK =  (ALL_ONES_LONG >>> PCLOCK_BITS) <<  PCLOCK_BITS;
 	public static final long CLOCK_MASK = (ALL_ONES_LONG << PCLOCK_BITS ) >>> PCLOCK_BITS;
-	
-	
+
+
 
 	public static int getClock(long data) {
 		return (int)( data & CLOCK_MASK  );
@@ -43,7 +43,7 @@ public final class PairHardCodeWordTricks{
 		return to;
 	}
 
-	
+
 
 	public static long setPclock(int pclock, long to) {
 		to &= ~PCLOCK_MASK;
@@ -70,13 +70,13 @@ public final class PairHardCodeWordTricks{
 	public static boolean clockIsLessThanOrEqual(long first, long second) {
 		return (first & CLOCK_MASK) <= (second & CLOCK_MASK);
 	}
-	
-	
-	
-	
 
-	public static String toString(int data) {		
-	
+
+
+
+
+	public static String toString(int data) {
+
 		String str = "";
 		str += "<";
 		str += getClock(data);
