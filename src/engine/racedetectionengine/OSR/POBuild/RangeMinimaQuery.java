@@ -27,15 +27,10 @@ public class RangeMinimaQuery {
         int treeSize = exp - 1;
 
         this.segmentTree = new int[treeSize];
-
-//        System.out.println("nums length = " + this.numsSize);
-//        System.out.println("tree array size = " + treeSize);
-//        System.out.println(this.numsSize);
     }
 
     public void buildTree(ArrayList<Integer> nums){
         if(nums.size() > 0) {
-//            System.out.println("==================================================");
             this.buildUpArray(nums);
             this.buildTree(0, 0, this.numsSize - 1, nums);
         }
@@ -106,8 +101,6 @@ public class RangeMinimaQuery {
             } else {
                 right = mid - 1;
             }
-
-//			System.out.println("left : " + left + ", " + right + ", " + mid);
         }
 
         return left;
@@ -138,24 +131,16 @@ public class RangeMinimaQuery {
                     return 0;
                 }
             }
-
-//			System.out.println("right : " + left + ", " + right + ", " + mid);
         }
 
         return left;
     }
 
     public int getMinWithRange(int leftInThId, int rightInThId) {
-
         if(this.inThreadIdArray.size() == 0) return -1;
-
-//		this.printArray();
 
         int right = searchIndexLeft(leftInThId);
         int left = searchIndexRight(rightInThId);
-
-//		System.out.println("input : " + i + ", " + j);
-//		System.out.println("query : " + left + ", " + right);
 
         if(left < 0 || right >= this.inThreadIdArray.size() || left > right) return -1;
 

@@ -88,76 +88,67 @@ public class POBuildReverse {
         }
     }
 
-    public void readMetaInfo(){
-        String metaDir = "";
-
-        if (this.traceDir.endsWith("std")) {
-            metaDir = this.traceDir.substring(0, this.traceDir.length() - 3) + "ssp";
-        } else {
-            System.out.println("Please check input, the meta info file is not found !");
-            System.exit(1);
-        }
-
+    public void getNumThreadsAndEvents() {
         try {
-            BufferedReader in = new BufferedReader(new FileReader(metaDir));
-            String line;
+            BufferedReader in = new BufferedReader(new FileReader(this.traceDir));
+            String line = in.readLine();
 
-            // read total num of events
-            line = in.readLine();
-            this.totalNumEvents = Integer.parseInt(line.split("=")[1].strip());
+            while (line != null){
+                String threadName = line.split("\\|")[0];
 
-            // read number of threads
-            line = in.readLine();
-            this.numThreads = Integer.parseInt(line.split("=")[1].strip());
-
-            for(int i=0;i<this.numThreads;i++){
-                line = in.readLine();
-                String[] split = line.split("=");
-                String threadName = split[0].strip();
-                String[] threadInfo = split[1].strip().split(",");
-                int threadId = Integer.parseInt(threadInfo[0]);
-                int numEvents = Integer.parseInt(threadInfo[1]);
-
-                this.threadNameToId.put(threadName, threadId);
-                this.threadNameToCnt.put(threadId, 0);
-                this.threadNameToNumEvents.put(threadId, numEvents);
-                this.threads.add(threadName);
-
-                this.recentRead.put(i, new HashMap<>());
-                this.recentWrite.put(i, new HashMap<>());
-                this.recentAcq.put(i, new HashMap<>());
-            }
-
-            // init succ
-            for(int i=0;i<this.numThreads;i++){
-                this.upperBounds.put(i, new HashMap<>());
-                this.succFromNode.put(i, new HashMap<>());
-                this.succToNode.put(i, new HashMap<>());
-
-                for(int j=0;j<this.numThreads;j++){
-                    if(i != j){
-                        this.upperBounds.get(i).put(j, -1);
-                        this.succFromNode.get(i).put(j, new ArrayList<>());
-                        this.succToNode.get(i).put(j, new ArrayList<>());
-                    }
+                if (!this.threads.contains(threadName)) {
+                    this.threads.add(threadName);
+                    this.threadNameToId.put(threadName, this.threadNameToId.size());
+                    int threadId = this.threadNameToId.get(threadName);
+                    this.threadNameToNumEvents.put(threadId, 0);
                 }
-            }
 
-            // init inThreadIdToAuxId
-            this.inThreadIdToAuxId = (ArrayList<Long>[]) Array.newInstance(ArrayList.class, this.numThreads);
-            for(int i=0;i<numThreads;i++){
-                this.inThreadIdToAuxId[i] = new ArrayList<>();
+                int threadId = this.threadNameToId.get(threadName);
+                this.threadNameToNumEvents.put(threadId, threadNameToNumEvents.get(threadId) + 1);
+                this.totalNumEvents += 1;
+                line = in.readLine();
             }
 
             in.close();
+            this.numThreads = threadNameToNumEvents.size();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-//        System.out.println(this.totalNumEvents);
-//        System.out.println(this.numThreads);
-//        System.out.println(this.threadNameToNumEvents);
     }
+
+    public void readMetaInfo(){
+
+        this.getNumThreadsAndEvents();
+
+        for(int i=0;i<this.numThreads;i++){
+            this.threadNameToCnt.put(i, 0);
+            this.recentRead.put(i, new HashMap<>());
+            this.recentWrite.put(i, new HashMap<>());
+            this.recentAcq.put(i, new HashMap<>());
+        }
+
+        // init succ
+        for(int i=0;i<this.numThreads;i++){
+            this.upperBounds.put(i, new HashMap<>());
+            this.succFromNode.put(i, new HashMap<>());
+            this.succToNode.put(i, new HashMap<>());
+
+            for(int j=0;j<this.numThreads;j++){
+                if(i != j){
+                    this.upperBounds.get(i).put(j, -1);
+                    this.succFromNode.get(i).put(j, new ArrayList<>());
+                    this.succToNode.get(i).put(j, new ArrayList<>());
+                }
+            }
+        }
+
+        // init inThreadIdToAuxId
+        this.inThreadIdToAuxId = (ArrayList<Long>[]) Array.newInstance(ArrayList.class, this.numThreads);
+        for(int i=0;i<numThreads;i++){
+            this.inThreadIdToAuxId[i] = new ArrayList<>();
+        }
+    }
+
 
     public void parseLine(String line){
         String[] info = line.split("\\|");
