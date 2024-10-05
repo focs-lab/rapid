@@ -237,11 +237,13 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         prevTLC.setClockIndex(threadIdx, original + 1);
     }
 
-
+    // check if e2 (a write event) is in race with a previous read or write event
     public boolean checkWrite(OSRState state, int verbosity, AccessEventInfo e2) {
         return checkAccessTwoLists(state, verbosity, state.eventsVarsRead, state.eventsVarsWrite, e2);
     }
 
+    // Check if e2 (a write or read event) is in race with a previous read or write event in events
+    // Note that we save read and write in different lists
     public boolean checkAccess(OSRState state, int verbosity, HashMap<Integer, ArrayList<AccessEventInfo>>[] events, AccessEventInfo e2) {
         int varId = this.variable.getId();
 
@@ -274,6 +276,9 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         return false;
     }
 
+    // Check if e2 (a write or read event) is in race with a previous read or write event in events
+    // Note that we save read and write in different lists.
+    // That's why here we have an input read list and another input write list
     public boolean checkAccessTwoLists(OSRState state, int verbosity, HashMap<Integer, ArrayList<AccessEventInfo>>[] readList,
                                        HashMap<Integer, ArrayList<AccessEventInfo>>[] writeList, AccessEventInfo e2) {
         int varId = this.variable.getId();
@@ -329,15 +334,17 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         return false;
     }
 
+    // entry method for checking races with a read event e2
     public boolean checkRead(OSRState state, int verbosity, AccessEventInfo e2) {
         return checkAccess(state, verbosity, state.eventsVarsWrite, e2);
     }
 
+    // Check if event toCheck is contained in VectorClock v
     public boolean checkEventInVectorstamp(VectorClock v, EventInfo toCheck, int thIdx) {
         return v.getClock().get(thIdx) >= toCheck.inThreadId;
     }
 
-
+    // Check if current event set contains more than 1 open acq for each lock
     public boolean checkOpenAcquires(OSRState state) {
         for(Lock lock : state.locks){
             short openNum = state.lockToOpenAcquireNum.get(lock.getId());
@@ -347,6 +354,8 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         return true;
     }
 
+    // Find the earliest event e1 in events1 by binary search,
+    // s.t. e1 is not in the TLClosure of e2
     private int binarySearchByTLC(OSRState state, ArrayList<AccessEventInfo> events1, AccessEventInfo e2, int e1ThId) {
         VectorClock prevE2TLC = e2.prevTLC;
         if (prevE2TLC == null) return 0;
@@ -367,7 +376,7 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         return mid;
     }
 
-
+    // For given two events e1, e2, check if they are in race
     public boolean checkRace(AccessEventInfo e1, AccessEventInfo e2, int e1ThId, int e2ThId, OSRState state) {
         calcOSR(e1, e2, e1ThId, e2ThId, state);
 
@@ -386,6 +395,7 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         return !hasCycle;
     }
 
+    // For given e1, e2, build the abstract graph
     public boolean buildGraph(OSRState state, List<Triplet<Integer, AcqEventInfo, Integer>> backwardEdges,
                               AccessEventInfo e1, AccessEventInfo e2, int e1ThId, int e2ThId){
         List<Triplet<Integer, Integer, Long>> nodes = new ArrayList<>(); // <thId, inThreadId-1, auxId>
@@ -433,7 +443,7 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         return cd.detectCycles();
     }
 
-
+    // For given e1, e2, compute the OLClosure
     public void calcOSR(AccessEventInfo e1, AccessEventInfo e2, int e1ThId, int e2ThId, OSRState state) {
         state.osrEventSet.updateWithMax(state.osrEventSet, e1.prevTLC);
 
@@ -509,6 +519,8 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         }
     }
 
+    // After finishing checking races for a given e and a thread t,
+    // reinit all the data structures to start over
     public void reInit(OSRState state) {
         state.recentRelMapAlgo.clear();
         state.recentRelThreadId.clear();
@@ -530,6 +542,8 @@ public class OSREvent extends RaceDetectionEvent<OSRState> {
         state.osrEventSet.setToZero();
     }
 
+    // For a given OSRClosure, find all last-release -> open acquire edges
+    // For each backward edge, return a triplet <lockId, open acq event, thread id of open acq event>
     private List<Triplet<Integer, AcqEventInfo, Integer>> getAllBackwardEdges(OSRState state) {
         List<Triplet<Integer, AcqEventInfo, Integer>> ret = new ArrayList<>();
 

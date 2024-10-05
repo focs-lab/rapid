@@ -2,6 +2,8 @@ package engine.racedetectionengine.OSR.POBuild;
 
 import java.util.ArrayList;
 
+
+// This class is not used for OSR, please ignore this.
 public class NumArrayMin {
 
 	public ArrayList<int[]> nums;

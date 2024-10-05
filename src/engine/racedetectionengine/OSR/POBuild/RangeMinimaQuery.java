@@ -2,6 +2,7 @@ package engine.racedetectionengine.OSR.POBuild;
 
 import java.util.ArrayList;
 
+// This class solves Range Minima Query using segment tree
 public class RangeMinimaQuery {
     public ArrayList<Integer> inThreadIdArray;
     public int[] segmentTree; // tree node = [left idx of nums, right idx of nums, minVal]
@@ -9,13 +10,15 @@ public class RangeMinimaQuery {
 
     public RangeMinimaQuery(){}
 
+    // Given the partial order built in POBuildReverse, initialize the segment tree
+    // There is an edge from fromNodes[i] to toNodes[i].
     public RangeMinimaQuery(ArrayList<Integer> fromNodes, ArrayList<Integer> toNodes){
 //        this.nums = nums;
         this.inThreadIdArray = fromNodes;
         this.buildTree(toNodes);
     }
 
-
+    // Compute the size of segment tree
     public void buildUpArray(ArrayList<Integer> nums){
         this.numsSize = nums.size();
 
@@ -29,6 +32,7 @@ public class RangeMinimaQuery {
         this.segmentTree = new int[treeSize];
     }
 
+    // Entry method for building segment tree
     public void buildTree(ArrayList<Integer> nums){
         if(nums.size() > 0) {
             this.buildUpArray(nums);
@@ -36,6 +40,8 @@ public class RangeMinimaQuery {
         }
     }
 
+    // Build the tree for segment [numsLeft, numsRight] in nums array.
+    // This method returns the value we should save in this.segmentTree[treeLoc].
     public int buildTree(int treeLoc, int numsLeft, int numsRight, ArrayList<Integer> nums){
         int val;
         if(numsLeft == numsRight){
@@ -54,7 +60,7 @@ public class RangeMinimaQuery {
         return val;
     }
 
-
+    // Given a query [left, right], return the min value in this range
     public int rangeQueryMin(int left, int right){
         if(left < 0 || right >= this.numsSize || left > right) return -1;
         else return rangeQueryMin(0, 0, this.numsSize - 1, left, right);
@@ -136,6 +142,9 @@ public class RangeMinimaQuery {
         return left;
     }
 
+    // Note that the input leftInThId, rightInThId are different from the index
+    // of this.segmentTree index.
+    // This methods maps a query on in-thread Id into segmentTree index and performs the query.
     public int getMinWithRange(int leftInThId, int rightInThId) {
         if(this.inThreadIdArray.size() == 0) return -1;
 
