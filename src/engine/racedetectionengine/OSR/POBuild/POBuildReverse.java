@@ -12,6 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+// This class builds the partial order for the trace.
+// Partial order includes write-write, read-write, write-read, rel-acq, fork and join
+
 public class POBuildReverse {
 
     private String traceDir;
@@ -64,6 +67,10 @@ public class POBuildReverse {
         this.readMetaInfo();
     }
 
+
+    // This is the entry method for building the partial order
+    // It parses the trace backwards, i.e. from last event to first event
+    // For each event, it calls the parseLine(line) method to update data structures
     public void readTraceAndUpdateDS(){
         ReversedLinesFileReader rf = null;
         try {
@@ -87,6 +94,7 @@ public class POBuildReverse {
             }
         }
     }
+
 
     public void getNumThreadsAndEvents() {
         try {
@@ -116,6 +124,9 @@ public class POBuildReverse {
         }
     }
 
+
+    // This method reads trace once quickly and get number of threads/events for the trace
+    // Then it initializes all the needed data structures for building partial order
     public void readMetaInfo(){
 
         this.getNumThreadsAndEvents();
@@ -149,7 +160,7 @@ public class POBuildReverse {
         }
     }
 
-
+    // parses event type and call corresponding handler method
     public void parseLine(String line){
         String[] info = line.split("\\|");
         String threadName = info[0];
@@ -378,6 +389,11 @@ public class POBuildReverse {
         varNameToThreads.get(target).add(threadId);
     }
 
+
+    // All added edges are inserted via this method
+    // An optimization is applied to reduce redundant edges:
+    // If e1 is po-rf before e2, and there is a direct edge from e1 to e2,
+    // then there is no need to add e1 -> e2, because po-rf already orders them.
     public void addEdge(int fromThId, int toThId, int fromInThId, int toInThId){
         if(fromThId == toThId) return;
 

@@ -5,13 +5,10 @@ import util.vectorclock.VectorClock;
 
 import java.util.*;
 
-// A partial order over nodes of the form p=(x,y), where p.first is the thread id and p.second is the local (incremental) id
-
+// This class exposes the method for abstract graph building
 
 public class PartialOrder {
-	public int width;
-//	public List<Map<Integer, RangeMinima>> successors;
-
+	public int width; // number of threads
 	public List<Map<Integer, RangeMinimaQuery>> successors;
 
 	public PartialOrder(Map<Integer, Map<Integer, ArrayList<Integer>>> succFromNode,
@@ -41,8 +38,8 @@ public class PartialOrder {
 	}
 	
 
-	// Given an event e1 and osr set, return the earliest events e2 in every thread, s.t. there is a
-	// path from e1 to e2
+	// Given an event e1 and osr set, return the earliest events e2 in every thread,
+	// s.t. there is a forward path from e1 to e2
 	public VectorClock queryForEvent(Triplet<Integer, Integer, Long> event, VectorClock osr,
 									 ArrayList<Long>[] inThreadIdToAuxId){
 		// event = <threadId, inThreadId, auxId>
@@ -65,7 +62,7 @@ public class PartialOrder {
 			ret.setClockIndex(i, firstInToThread);
 		}
 
-//		====== T^3 updating algo ======
+//		====== This is the deprecated O(T^3) updating algo ======
 //		for(int i=0; i<this.width; i++){
 //			boolean hasChanged = false;
 //
@@ -90,7 +87,7 @@ public class PartialOrder {
 //			if(!hasChanged) break;
 //		}
 
-//		===== T^2 updating algo =====
+//		===== This is the O(T^2) updating algo in the paper =====
 		HashSet<Integer> unvisited = new HashSet<>();
 		for(int i=0; i<numThreads; i++) {
 			if (i != threadId) unvisited.add(i);
@@ -116,7 +113,6 @@ public class PartialOrder {
 				if (curTh == -1 || minAuxId > curAuxId) {
 					curTh = i;
 					minAuxId = curAuxId;
-//						System.out.println("found wired localId = " + localId);
 				}
 			}
 
@@ -133,15 +129,17 @@ public class PartialOrder {
 			}
 		}
 
-//		System.out.println(event.third + ",  " + ret);
-
 		return ret;
 	}
 
+	// This is the entry method for building the abstract graph.
+	// Given a list of events (events) and current OLClosure (osr),
+	// returns a vector clock vc for each event e in events,
+	// where vc[i] = e's first successor in thread i
 	public List<VectorClock> queryForEventLists(List<Triplet<Integer, Integer, Long>> events, VectorClock osr,
 												ArrayList<Long>[] inThreadIdToAuxId){
 		// input = list( <threadId, inThreadId, auxId> )
-		// returns a vector clock for each event e, where vc[i] = e's first successor in thread i
+		//
 
 		List<VectorClock> ret = new ArrayList<>();
 
