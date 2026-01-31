@@ -37,4 +37,25 @@ public class OSR {
         System.out.println("Racy events: " + racyEvents);
         System.out.println("Number of racy locations: " + engine.state.racyLocations.size());
     }
+
+    public static void analysis(String traceFile) {
+        long startTimeAnalysis = System.currentTimeMillis();
+
+        OSREngine engine = new OSREngine(ParserType.STD, traceFile);
+        engine.analyzeTrace(true, 0);
+
+        long stopTimeAnalysis = System.currentTimeMillis();
+        long timeAnalysis = stopTimeAnalysis - startTimeAnalysis;
+        double timeInSeconds = timeAnalysis * 1.0 / 1000;
+        double timeInMin = timeAnalysis * 1.0 / 60000;
+        ArrayList<Long> racyEvents = new ArrayList<>(engine.state.racyEvents);
+        racyEvents.sort((a, b) -> Math.toIntExact(a - b));
+        System.out.println("======================================================");
+        System.out.println("Time for analysis = " + timeAnalysis + " milliseconds");
+        System.out.println("Time for analysis in seconds = " + String.format("%.3f", timeInSeconds));
+        System.out.println("Time for analysis in mins = " + String.format("%.1f", timeInMin));
+        System.out.println("Number of racy events: " + engine.state.racyEvents.size());
+//        System.out.println("Racy events: " + racyEvents);
+        System.out.println("Number of racy locations: " + engine.state.racyLocations.size());
+    }
 }

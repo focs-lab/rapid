@@ -1,6 +1,7 @@
 import cmd.CmdOptions;
 import cmd.GetOptions;
 import engine.racedetectionengine.wcp.WCPEngine;
+import parse.ParserType;
 
 public class WCP {
 
@@ -27,5 +28,22 @@ public class WCP {
 					"Time for full analysis = " + timeAnalysis + " milliseconds");
 		}
 
+	}
+
+	public static void analysis(String traceFile) {
+		boolean time_reporting = true;
+		long startTimeAnalysis = 0;
+		if (time_reporting) {
+			startTimeAnalysis = System.currentTimeMillis(); // System.nanoTime();
+		}
+
+		WCPEngine engine = new WCPEngine(ParserType.STD, traceFile);
+		engine.analyzeTrace(false, 0);
+
+		if (time_reporting) {
+			long stopTimeAnalysis = System.currentTimeMillis(); // System.nanoTime();
+			long timeAnalysis = stopTimeAnalysis - startTimeAnalysis;
+			System.out.println("Time for full analysis = " + timeAnalysis + " milliseconds");
+		}
 	}
 }

@@ -1,6 +1,7 @@
 import cmd.CmdOptions;
 import cmd.GetOptions;
 import engine.racedetectionengine.syncpreserving.SyncPreservingRaceOfflineEngine;
+import parse.ParserType;
 
 public class SyncPreserving {
 
@@ -20,6 +21,24 @@ public class SyncPreserving {
 		SyncPreservingRaceOfflineEngine engine = new SyncPreservingRaceOfflineEngine(
 				options.parserType, options.path);
 		engine.analyzeTrace(options.multipleRace, options.verbosity);
+
+		if (time_reporting) {
+			long stopTimeAnalysis = System.currentTimeMillis(); // System.nanoTime();
+			long timeAnalysis = stopTimeAnalysis - startTimeAnalysis;
+			System.out.println("Time for analysis = " + timeAnalysis + " milliseconds");
+		}
+	}
+
+	public static void analysis(String traceFile) {
+		boolean time_reporting = true;
+		long startTimeAnalysis = 0;
+		if (time_reporting) {
+			startTimeAnalysis = System.currentTimeMillis(); // System.nanoTime();
+		}
+
+		SyncPreservingRaceOfflineEngine engine = new SyncPreservingRaceOfflineEngine(
+				ParserType.STD, traceFile);
+		engine.analyzeTrace(true, 0);
 
 		if (time_reporting) {
 			long stopTimeAnalysis = System.currentTimeMillis(); // System.nanoTime();

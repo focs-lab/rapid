@@ -1,6 +1,7 @@
 import cmd.CmdOptions;
 import cmd.GetOptions;
 import engine.racedetectionengine.shb.SHBEngine;
+import parse.ParserType;
 
 public class SHB {
 
@@ -19,6 +20,23 @@ public class SHB {
 
 		SHBEngine engine = new SHBEngine(options.parserType, options.path);
 		engine.analyzeTrace(options.multipleRace, options.verbosity);
+
+		if (time_reporting) {
+			long stopTimeAnalysis = System.currentTimeMillis();
+			long timeAnalysis = stopTimeAnalysis - startTimeAnalysis;
+			System.out.println("Time for analysis = " + timeAnalysis + " milliseconds");
+		}
+	}
+
+	public static void analysis(String traceFile) {
+		boolean time_reporting = true;
+		long startTimeAnalysis = 0;
+		if (time_reporting) {
+			startTimeAnalysis = System.currentTimeMillis();
+		}
+
+		SHBEngine engine = new SHBEngine(ParserType.STD, traceFile);
+		engine.analyzeTrace(true, 0);
 
 		if (time_reporting) {
 			long stopTimeAnalysis = System.currentTimeMillis();
