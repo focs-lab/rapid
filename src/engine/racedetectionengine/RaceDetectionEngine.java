@@ -87,7 +87,7 @@ public abstract class RaceDetectionEngine<St extends State, RDE extends RaceDete
 	public void analyzeTrace(boolean multipleRace, int verbosity) {
 		eventCount = (long) 0;
 		raceCount = (long) 0;
-		locIdsOfRacyEvents = new HashSet<Integer>();
+		locIdsOfRacyEvents = new HashSet<>();
 		totalSkippedEvents = (long) 0;
 		if (this.parserType.isRV()) {
 			analyzeTraceRV(multipleRace, verbosity);

@@ -51,4 +51,9 @@ public class Epoch {
 	public boolean isLessThanOrEqual(VectorClock vc) {
 		return this.clock <= vc.getClock().get(this.threadIdx);
 	}
+
+	public void copyFrom(Epoch epoch) {
+		this.clock = epoch.clock;
+		this.threadIdx = epoch.threadIdx;
+	}
 }
