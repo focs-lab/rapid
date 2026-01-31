@@ -1,19 +1,10 @@
 import cmd.CmdOptions;
 import cmd.GetOptions;
 import engine.racedetectionengine.OSR.OSREngine;
-import engine.racedetectionengine.OSR.POBuild.POBuildReverse;
-import engine.racedetectionengine.hb.HBEngine;
-import event.Event;
-import event.Lock;
-import event.Thread;
-import event.Variable;
 import parse.ParserType;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class OSR {
     public static void main(String[] args) throws IOException {

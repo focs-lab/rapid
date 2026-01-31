@@ -8,11 +8,12 @@ public class Main {
                 case "SyncP" -> SyncPreserving.analysis(trace_dir);
                 case "SHB" -> SHB.analysis(trace_dir);
                 case "OSR" -> OSR.analysis(trace_dir);
+                case "OSR-Witness" -> OSRWitness.analysis(trace_dir);
                 case "WCP" -> WCP.analysis(trace_dir);
                 case "WCP-Sound" -> WCPSound.analysis(trace_dir);
                 default -> {
                     System.out.println(algo + " is not recognized. ");
-                    System.out.println("Supported algo = [SyncP, SHB, OSR, WCP-Sound, WCP]");
+                    System.out.println("Supported algo = [SyncP, SHB, OSR, WCP-Sound, WCP, OSR-Witness]");
                 }
             }
         } else {
