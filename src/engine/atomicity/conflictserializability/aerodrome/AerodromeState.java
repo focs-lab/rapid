@@ -36,8 +36,6 @@ public class AerodromeState extends State {
 	//Optimization data structures
 	public HashMap<Thread, HashSet<Variable>> updateSetThread_write; // UpdateSet^w
 	public HashMap<Thread, HashSet<Variable>> updateSetThread_read; // UpdateSet^r
-	public HashSet<Variable> staleWrites; // Stale^w
-	public HashMap<Variable, HashSet<Thread>> staleReads; // Stale^r
 
 	// Other data-structures to track if parent transaction is alive
 	public HashMap<Thread, HashSet<Thread>> threadsForkedInActiveTransaction;
@@ -108,9 +106,6 @@ public class AerodromeState extends State {
 			this.updateSetThread_write.put(t, new HashSet<Variable> ());
 		}
 		
-		this.staleReads = new HashMap<Variable, HashSet<Thread>> ();
-		this.staleWrites = new HashSet<Variable> ();
-		
 		this.parentTransactionIsAlive = new HashSet<Thread> ();
 		this.threadsForkedInActiveTransaction = new HashMap<Thread, HashSet<Thread>> ();
 		for(Thread t: tSet) {
@@ -158,7 +153,6 @@ public class AerodromeState extends State {
 			this.clockReadVariable.put(v, new VectorClockOpt(this.numThreads));
 			this.clockReadVariableCheck.put(v, new VectorClockOpt(this.numThreads));
 			this.clockWriteVariable.put(v, new VectorClockOpt(this.numThreads));
-			this.staleReads.put(v,  new HashSet<Thread> ());
 		}
 		return variableToIndex.get(v);
 	}
@@ -197,6 +191,14 @@ public class AerodromeState extends State {
 		for(Thread u: this.threadToIndex.keySet()) {
 			if(!u.equals(t)) {
 				VectorClockOpt C_u = getVectorClock(clockThread, u);
+
+				int uIndex = this.threadToIndex.get(u);
+				VectorClockOpt C_u_begin = this.clockThreadBegin.get(uIndex);
+				if(C_u_begin.isLessThanOrEqual(C_t, uIndex)) {					
+					this.updateSetThread_read.get(u).addAll(this.updateSetThread_read.get(t));
+					this.updateSetThread_write.get(u).addAll(this.updateSetThread_write.get(t));
+				}
+
 				if(C_t_begin.isLessThanOrEqual(C_u, tIndex)) {
 					violationDetected |= checkAndGetClock(C_t, C_t, u);
 					if(violationDetected) break;
@@ -213,13 +215,8 @@ public class AerodromeState extends State {
 		}
 		
 		for(Variable v: this.updateSetThread_write.get(t)) {
-			if(staleWrites.contains(v) || lastThreadToWrite.get(v).equals(t)) {
-				VectorClockOpt W_v = getVectorClock(clockWriteVariable, v);
-				W_v.updateWithMax(W_v, C_t);	
-			}
-			if(lastThreadToWrite.get(v).equals(t)) {	
-				staleWrites.remove(v);
-			}
+			VectorClockOpt W_v = getVectorClock(clockWriteVariable, v);
+			W_v.updateWithMax(W_v, C_t);	
 		}
 		this.updateSetThread_write.get(t).clear();
 		
@@ -228,7 +225,6 @@ public class AerodromeState extends State {
 			R_v.updateWithMax(R_v, C_t);
 			VectorClockOpt chR_v = getVectorClock(clockReadVariableCheck, v);			
 			updateCheckClock(chR_v, C_t, t);
-			staleReads.get(v).remove(t);
 		}
 		this.updateSetThread_read.get(t).clear();
 		
@@ -277,17 +273,6 @@ public class AerodromeState extends State {
 		VectorClockOpt C_t_begin = this.clockThreadBegin.get(tIndex);
 		VectorClockOpt C_t = this.clockThread.get(tIndex);
 		return C_t_begin.isLessThan(C_t);
-	}
-	
-	public void getReadClocksFromStaleThreads(Variable v) {
-		VectorClockOpt R_v = getVectorClock(clockReadVariable, v);
-		VectorClockOpt chR_v = getVectorClock(clockReadVariableCheck, v);	
-		for(Thread u: staleReads.get(v)) {
-			VectorClockOpt C_u = getVectorClock(clockThread, u);
-			R_v.updateWithMax(R_v, C_u);
-			updateCheckClock(chR_v, C_u, u);
-		}
-		staleReads.get(v).clear();
 	}
 
 	public boolean isThreadRelevant(Thread t){
