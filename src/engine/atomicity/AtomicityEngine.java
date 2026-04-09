@@ -58,10 +58,10 @@ public abstract class AtomicityEngine<St extends State, RDE extends AtomicityEve
 			System.out.println("|"+Long.toString(eventCount));
 		}
 
-		if (violationDetected) {
-			System.out.println("Violation is detected at trace event " + Long.toString(eventCount)
-					+ ": " + handlerEvent.toStandardFormat());
-		}
+		// if (violationDetected) {
+		// 	System.out.println("Violation is detected at trace event " + Long.toString(eventCount)
+		// 			+ ": " + handlerEvent.toStandardFormat());
+		// }
 		return violationDetected;
 	}
 

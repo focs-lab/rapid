@@ -148,6 +148,30 @@ final class IncrementalSimpleMaxCSSTs {
 		}
 	}
 
+	void insertEdgeWithOnlyBackwardClosureSpecial(int fromThread, int fromTransactionIdToAdd,
+			int fromTransactionIdForPred, int toThread, int toTransactionId) {
+		if (this.reachable(fromThread, fromTransactionIdForPred, toThread, toTransactionId)) {
+			return;
+		}
+
+		for (int predecessorThread = 0; predecessorThread < width; predecessorThread++) {
+			int predecessorTransactionId;
+			if (predecessorThread != fromThread) {
+				predecessorTransactionId = this.getPredecessor(fromThread, fromTransactionIdForPred,
+						predecessorThread);
+				if (predecessorTransactionId < 0) {
+					continue;
+				}
+			} else {
+				predecessorTransactionId = fromTransactionIdToAdd;
+			}
+
+			if (!this.reachable(predecessorThread, predecessorTransactionId, toThread, toTransactionId)) {
+				this.addSuccessor(predecessorThread, predecessorTransactionId, toThread, toTransactionId);
+			}
+		}
+	}
+
 	void print() {
 		for (int fromThread = 0; fromThread < width; fromThread++) {
 			for (int toThread = 0; toThread < width; toThread++) {
