@@ -103,12 +103,24 @@ public class POBuildReverse {
 
             while (line != null){
                 String threadName = line.split("\\|")[0];
+                String op = line.split("\\|")[1];
+                String opcode = op.split("\\(")[0];
+                String target = op.split("\\(")[1].split("\\)")[0];
 
                 if (!this.threads.contains(threadName)) {
                     this.threads.add(threadName);
                     this.threadNameToId.put(threadName, this.threadNameToId.size());
                     int threadId = this.threadNameToId.get(threadName);
                     this.threadNameToNumEvents.put(threadId, 0);
+                }
+
+                if (Objects.equals(opcode, "fork") || Objects.equals(opcode, "join")) {
+                    if (!this.threads.contains(target)) {
+                        this.threads.add(target);
+                        this.threadNameToId.put(target, this.threadNameToId.size());
+                        int threadId = this.threadNameToId.get(target);
+                        this.threadNameToNumEvents.put(threadId, 0);
+                    }
                 }
 
                 int threadId = this.threadNameToId.get(threadName);
