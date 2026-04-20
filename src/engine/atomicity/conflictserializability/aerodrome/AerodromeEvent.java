@@ -128,36 +128,20 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 		if(state.lastThreadToWrite.containsKey(v)) {
 			Thread last_writer = state.lastThreadToWrite.get(v);
 			if(!last_writer.equals(t)) {
-				if(state.staleWrites.contains(v)) {
-					VectorClockOpt C_last_writer = state.getVectorClock(state.clockThread, last_writer);
-					violationDetected |= state.checkAndGetClock(C_last_writer, C_last_writer, t);
-				}
-				else {
-					VectorClockOpt W_v = state.getVectorClock(state.clockWriteVariable, v);
-					violationDetected |= state.checkAndGetClock(W_v, W_v, t);
-				}
+				VectorClockOpt W_v = state.getVectorClock(state.clockWriteVariable, v);
+				violationDetected |= state.checkAndGetClock(W_v, W_v, t);
 			}
 		}
 		
-		if(!state.transactionIsActive(t)){
-			state.incClockThread(t);
-			
-			// Now update R_v and ChR_v pro-actively instead of adding t in staleReads.
-			VectorClockOpt R_v = state.getVectorClock(state.clockReadVariable, v);
-			VectorClockOpt chR_v = state.getVectorClock(state.clockReadVariableCheck, v);	
-			VectorClockOpt C_t = state.getVectorClock(state.clockThread, t);
-			R_v.updateWithMax(R_v, C_t);
-			state.updateCheckClock(chR_v, C_t, t);
-		}
-		else {
-			// Here we can add t to staleReads since all the reads 
-			// in the current active transactions should be updated 
-			// using the same clock, namely the current value of C_t.
-			// In the worst case, R_c and chR_v will be updated when 
-			// the current transaction ends.
-			state.staleReads.get(v).add(t);
-			
-		}
+		state.incClockThread(t);
+		
+		// Now update R_v and ChR_v pro-actively instead of adding t in staleReads.
+		VectorClockOpt R_v = state.getVectorClock(state.clockReadVariable, v);
+		VectorClockOpt chR_v = state.getVectorClock(state.clockReadVariableCheck, v);	
+		VectorClockOpt C_t = state.getVectorClock(state.clockThread, t);
+		R_v.updateWithMax(R_v, C_t);
+		state.updateCheckClock(chR_v, C_t, t);
+
 		
 		state.updateSetAtRead(t, v);
 		
@@ -175,18 +159,10 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 		if(state.lastThreadToWrite.containsKey(v)) {
 			Thread last_writer = state.lastThreadToWrite.get(v);
 			if(!last_writer.equals(t)) {
-				if(state.staleWrites.contains(v)) {
-					VectorClockOpt C_last_writer = state.getVectorClock(state.clockThread, last_writer);
-					violationDetected |= state.checkAndGetClock(C_last_writer, C_last_writer, t);
-				}
-				else {
-					violationDetected |= state.checkAndGetClock(W_v, W_v, t);
-				}
+				violationDetected |= state.checkAndGetClock(W_v, W_v, t);
 			}
 		}
 		
-				
-		state.getReadClocksFromStaleThreads(v);
 				
 		VectorClockOpt R_v = state.getVectorClock(state.clockReadVariable, v);
 		VectorClockOpt chR_v = state.getVectorClock(state.clockReadVariableCheck, v);
@@ -198,22 +174,11 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 
 		state.updateSetAtWrite(t, v);
 				
-		if(!state.transactionIsActive(t)){
-			state.incClockThread(t);
+		state.incClockThread(t);
 			
-			// Now update W_v pro-actively instead of adding x in staleWrites.
-			VectorClockOpt C_t = state.getVectorClock(state.clockThread, t);
-			W_v.updateWithMax(W_v, C_t);
-			state.staleWrites.remove(v);
-		}
-		else {
-			// Here we can add x to staleWrites since all the writes 
-			// in the current active transaction should be updated 
-			// using the same clock, namely the current value of C_t.
-			// In the worst case, W_x will be updated when the current
-			// transaction ends.
-			state.staleWrites.add(v);
-		}
+		// Now update W_v pro-actively instead of adding x in staleWrites.
+		VectorClockOpt C_t = state.getVectorClock(state.clockThread, t);
+		W_v.updateWithMax(W_v, C_t);
 		
 		return violationDetected;
 	}
@@ -282,15 +247,11 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 				violationDetected = state.handshakeAtEndEvent_Optimized(t);
 			}
 			else {
-				for(Variable v: state.updateSetThread_read.get(t)) {
-					state.staleReads.get(v).remove(t);
-				}
 				state.updateSetThread_read.get(t).clear();
 				
 				for(Variable v: state.updateSetThread_write.get(t)) {
 					if(state.lastThreadToWrite.containsKey(v)) {
 						if(state.lastThreadToWrite.get(v).equals(t)) {
-							state.staleWrites.remove(v);
 							state.lastThreadToWrite.remove(v); // Treat this variable as a fresh variable
 						}
 					}	
