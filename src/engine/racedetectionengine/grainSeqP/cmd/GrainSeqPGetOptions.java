@@ -1,37 +1,30 @@
-package cmd;
+package engine.racedetectionengine.grainSeqP.cmd;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import parse.ParserType;
+import cmd.GetOptions;
 
-public class GetOptions {
+public class GrainSeqPGetOptions extends GetOptions {
 
-	protected static final Logger log = Logger.getLogger(GetOptions.class.getName());
-	protected String[] args = null;
-	protected Options options = new Options();
-
-	public GetOptions(String[] args) {
-		this.args = args;
-		options.addOption("h", "help", false, "generate this message");
-		options.addOption("f", "format", true, "format of the trace. Possible choices include rv, csv, rr, std (Default : csv) ");
-		options.addOption("s", "single", false, "force the algorithm to terminate after the first race is detected");
-		options.addOption("p", "path", true, "the path to the trace file/folder (Required)");
-		options.addOption("v", "verbosity", true, "for setting verbosity: Allowed levels = 0, 1, 2 (Default : 0)");
-        options.addOption("m", "excluded-methods", true, "path to file that lists methods to be excluded");
+	public GrainSeqPGetOptions(String[] args) {
+		super(args);
+		options.addOption("lru", "lru", true, "Argument of Heuristic Optimizations");
+		options.addOption("gs", "grainSize", true, "Heuristic Optimizations");
+		options.addOption("gp", "grainPattern", false, "Heuristic Optimizations");
+		options.addOption("sub", "subsumption", false, "Heuristic Optimizations");
 	}
 
-	public CmdOptions parse() {
+	public GrainSeqPCmdOptions parse() {
 		CommandLineParser parser = new DefaultParser();
 		CommandLine cmd = null;
-		CmdOptions cmdOpt = new CmdOptions();;
+		GrainSeqPCmdOptions cmdOpt = new GrainSeqPCmdOptions();;
 
 		try {
 			cmd = parser.parse(options, args);
@@ -70,6 +63,24 @@ public class GetOptions {
                 cmdOpt.excludeList = cmd.getOptionValue("m") ;   
             }
 
+			if (cmd.hasOption("lru")) {
+				cmdOpt.doLRU = true;
+				cmdOpt.LRUSize = Integer.parseInt(cmd.getOptionValue("lru"));
+			}
+
+			if (cmd.hasOption("gs")) {
+				cmdOpt.doGrainSize = true;
+				cmdOpt.grainSize = Integer.parseInt(cmd.getOptionValue("gs"));
+			}
+
+			if(cmd.hasOption("gp")) {
+				cmdOpt.doGrainPattern = true;
+			}
+
+			if(cmd.hasOption("sub")) {
+				cmdOpt.doSubsumption = true;
+			}
+
 		} catch (ParseException e) {
 			help();
 		}
@@ -84,6 +95,6 @@ public class GetOptions {
 	}
 
 	public static void main(String[] args) {
-		new GetOptions(args).parse();
+		new GrainSeqPGetOptions(args).parse();
 	}
 }
