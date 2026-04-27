@@ -10,7 +10,7 @@ import parse.util.EventInfo;
 
 public class Parse {
 	// ACQUIRE, RELEASE, READ, WRITE, FORK, JOIN, BEGIN, END;
-	public static String matchStr[] = { "Acquire", "Release", "[A]?Rd", "[A]?Wr", "Start", "Join", "Enter", "Exit", "Dummy" };
+	public static String matchStr[] = { "Acquire", "Release", "[A|V]?Rd", "[A|V]?Wr", "Start", "Join", "Enter", "Exit", "Dummy" };
 	public static String prefixPattern = "^@[\\s]+(";
 	public static String suffixPattern = ")[(]([^,\\s]+)[,]([^,\\s]+)[)]([\\s]+)?([^,\\s]+)?([\\s]+)?([^,\\s]+)?";
 	public static String stringEventPattern = prefixPattern + String.join("|", matchStr) + suffixPattern;
@@ -21,17 +21,18 @@ public class Parse {
 		mapMatchType = new HashMap<String, EventType>();
 		for (EventType type : EventType.values()) {
 			String tp_str = matchStr[type.ordinal()];
-			if(tp_str.equals("[A]?Rd") || tp_str.equals("[A]?Wr")){
-				tp_str = tp_str.substring(4);
+			if(tp_str.equals("[A|V]?Rd") || tp_str.equals("[A|V]?Wr")){
+				tp_str = tp_str.substring(6);
 			}
 			mapMatchType.put(tp_str, type);
 		}
 	}
 
 	public static void example() {
-		String line = "@    ARd(2,null.test/Deadlock.value_I)  Final  Deadlock.java:50:7";
+		// String line = "@    ARd(2,null.test/Deadlock.value_I)  Final  Deadlock.java:50:7";
 //		String line = "@    Acquire(2,@03)";
 //		String line = "@   Exit(1,test/Deadlock.doSomething()V)";
+		String line = "@     AWr(0,@05[13])  Final  Functions.java:116:153";
 		Parse parse = new Parse();
 		EventInfo eInfo = new EventInfo();
 		try{
@@ -48,17 +49,17 @@ public class Parse {
 		if (matcher.find()) {
 			
 			String tp_str = matcher.group(1);
-			if(tp_str.equals("ARd") || tp_str.equals("AWr")){
+			if(tp_str.equals("ARd") || tp_str.equals("AWr") || tp_str.equals("VRd") || tp_str.equals("VWr") ){
 				tp_str = tp_str.substring(1);
 			}
 			EventType tp = mapMatchType.get(tp_str);
 			String thId = matcher.group(2);
 			String aux = matcher.group(3);
 			String locId = "";
-			if(tp.isAccessType()){
+			if(tp.isAccessType() || tp.isBegin() || tp.isEnd()){
 				locId = matcher.group(7);
 				if(locId == null){
-					throw new CannotParseException(line);
+					locId = "null";
 				}
 			}
 			eInfo.updateEventInfo(tp, thId, aux, locId);

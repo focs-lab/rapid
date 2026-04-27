@@ -246,6 +246,10 @@ public class ParseRoadRunner {
 						}
 					}
 				}
+				if(!line.startsWith("@")) {
+					// System.out.println(line);
+					shouldExclude = true;
+				}
 				if(!shouldExclude) {
 					parser.getInfo(eInfo, line);
 					validEvent = true;

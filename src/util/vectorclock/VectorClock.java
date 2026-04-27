@@ -1,8 +1,9 @@
 package util.vectorclock;
 
 import java.util.Vector;
+import java.io.Serializable;
 
-public class VectorClock implements Comparable<VectorClock> {
+public class VectorClock implements Comparable<VectorClock>, Serializable {
 
 	private int dim;
 	private Vector<Integer> clock;

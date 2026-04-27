@@ -19,11 +19,11 @@ public class ParseStandard {
 	private HashMap<String, Lock> lockMap;
 	private HashMap<String, Variable> variableMap;
 	int totThreads;
-	BufferedReader bufferedReader;
+	public BufferedReader bufferedReader;
 	String line;
 	Parse parser;
 	EventInfo eInfo;
-	long totEvents;
+	public long totEvents;
 
 	public ParseStandard(String traceFile){
 		threadMap = new HashMap<String, Thread>();
@@ -180,6 +180,18 @@ public class ParseStandard {
 
 	public int getTotalThreads(){
 		return totThreads;
+	}
+
+	public int getNumOfThreads() {
+		return this.threadMap.size();
+	}
+
+	public int getNumOfVars() {
+		return this.variableMap.size();
+	}
+
+	public int getNumOfLocks() {
+		return this.lockMap.size();
 	}
 	
 	public static void demo(){
