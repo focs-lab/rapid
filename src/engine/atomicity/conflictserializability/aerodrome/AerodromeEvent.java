@@ -128,25 +128,23 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 		if(state.lastThreadToWrite.containsKey(v)) {
 			Thread last_writer = state.lastThreadToWrite.get(v);
 			if(!last_writer.equals(t)) {
-				if(state.staleWrites.contains(v)) {
-					VectorClockOpt C_last_writer = state.getVectorClock(state.clockThread, last_writer);
-					violationDetected |= state.checkAndGetClock(C_last_writer, C_last_writer, t);
-				}
-				else {
-					VectorClockOpt W_v = state.getVectorClock(state.clockWriteVariable, v);
-					violationDetected |= state.checkAndGetClock(W_v, W_v, t);
-				}
+				VectorClockOpt W_v = state.getVectorClock(state.clockWriteVariable, v);
+				violationDetected |= state.checkAndGetClock(W_v, W_v, t);
 			}
 		}
 		
-		state.staleReads.get(v).add(t);
+		state.incClockThread(t);
+		
+		// Now update R_v and ChR_v pro-actively instead of adding t in staleReads.
+		VectorClockOpt R_v = state.getVectorClock(state.clockReadVariable, v);
+		VectorClockOpt chR_v = state.getVectorClock(state.clockReadVariableCheck, v);	
+		VectorClockOpt C_t = state.getVectorClock(state.clockThread, t);
+		R_v.updateWithMax(R_v, C_t);
+		state.updateCheckClock(chR_v, C_t, t);
 
+		
 		state.updateSetAtRead(t, v);
 		
-		if(!state.transactionIsActive(t)){
-			state.incClockThread(t);
-		}
-
 		return violationDetected;
 	}
 
@@ -156,38 +154,32 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 		Thread t = this.getThread();
 		Variable v = this.getVariable();
 		state.checkAndAddVariable(v);
+		VectorClockOpt W_v = state.getVectorClock(state.clockWriteVariable, v);
 					
 		if(state.lastThreadToWrite.containsKey(v)) {
 			Thread last_writer = state.lastThreadToWrite.get(v);
 			if(!last_writer.equals(t)) {
-				if(state.staleWrites.contains(v)) {
-					VectorClockOpt C_last_writer = state.getVectorClock(state.clockThread, last_writer);
-					violationDetected |= state.checkAndGetClock(C_last_writer, C_last_writer, t);
-				}
-				else {
-					VectorClockOpt W_v = state.getVectorClock(state.clockWriteVariable, v);
-					violationDetected |= state.checkAndGetClock(W_v, W_v, t);
-				}
+				violationDetected |= state.checkAndGetClock(W_v, W_v, t);
 			}
 		}
-				
-		state.getReadClocksFromStaleThreads(v);
+		
 				
 		VectorClockOpt R_v = state.getVectorClock(state.clockReadVariable, v);
 		VectorClockOpt chR_v = state.getVectorClock(state.clockReadVariableCheck, v);
-		
+				
 		violationDetected |= state.checkAndGetClock(chR_v, R_v, t);
 		
-		state.staleWrites.add(v);
 	
 		state.lastThreadToWrite.put(v, t);
 
 		state.updateSetAtWrite(t, v);
 				
-		if(!state.transactionIsActive(t)){
-			state.incClockThread(t);
-		}
-
+		state.incClockThread(t);
+			
+		// Now update W_v pro-actively instead of adding x in staleWrites.
+		VectorClockOpt C_t = state.getVectorClock(state.clockThread, t);
+		W_v.updateWithMax(W_v, C_t);
+		
 		return violationDetected;
 	}
 
@@ -240,6 +232,7 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 		// else Treat this as a no-op
 		
 		state.incrementNestingDepth(t);
+				
 		return violationDetected;
 	}
 
@@ -254,15 +247,11 @@ public class AerodromeEvent extends AtomicityEvent<AerodromeState> {
 				violationDetected = state.handshakeAtEndEvent_Optimized(t);
 			}
 			else {
-				for(Variable v: state.updateSetThread_read.get(t)) {
-					state.staleReads.get(v).remove(t);
-				}
 				state.updateSetThread_read.get(t).clear();
 				
 				for(Variable v: state.updateSetThread_write.get(t)) {
 					if(state.lastThreadToWrite.containsKey(v)) {
 						if(state.lastThreadToWrite.get(v).equals(t)) {
-							state.staleWrites.remove(v);
 							state.lastThreadToWrite.remove(v); // Treat this variable as a fresh variable
 						}
 					}	

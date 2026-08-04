@@ -77,7 +77,7 @@ public abstract class RaceDetectionEngine<St extends State, RDE extends RaceDete
 				System.out.println("Race detected at event " + eventCount + " : "
 						+ handlerEvent.toStandardFormat());
 			} else {
-				System.out.println(handlerEvent.getLocId());
+//				System.out.println(handlerEvent.getLocId());
 			}
 			this.locIdsOfRacyEvents.add(handlerEvent.getLocId());
 		}
