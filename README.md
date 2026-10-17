@@ -1,4 +1,4 @@
-<a href="url"><img src="rapid.png" align="right" width="120" ></a>
+<img src="rapid.png" alt="RAPID logo" align="right" width="120">
 
 ## RAPID : Dynamic Analysis for Concurrent Programs
 
@@ -6,6 +6,40 @@ RAPID is a lightweight framework for implementing dynamic analyses for concurren
 
 For the sake of simplicity, RAPID does not support its own logging mechanism but can leverage instrumentation of external tools ---  [RVPredict][2] or [RoadRunner][12] --- for logging program executions (_traces_).
 On top of this, RAPID provides functionality for reading these traces. RAPID also supports two more trace formats: CSV and STD, described below.
+
+### Quick start
+
+RAPID analyses recorded traces; the example below creates a tiny trace by hand.
+You do not need to instrument a program to try it.
+
+With a JDK and Apache Ant installed, run these commands on Linux or macOS:
+
+```sh
+git clone https://github.com/focs-lab/rapid.git
+cd rapid
+ant build
+
+cat > example.std <<'EOF'
+T0|w(x)|1
+T1|r(x)|2
+EOF
+
+java -cp 'bin:lib/*:lib/jgrapht/*' HB -f std -p example.std
+```
+
+The two accesses touch the same variable from different threads, with no
+synchronization between them. The happens-before (`HB`) engine reports a race.
+On Windows, use `;` instead of `:` to separate classpath entries.
+
+For command-line options, run:
+
+```sh
+java -cp 'bin:lib/*:lib/jgrapht/*' HB --help
+```
+
+[Analysis engines and their papers](#rapid-architecture) ·
+[Trace formats](#trace-formats) ·
+[Recording RoadRunner traces](notes/Generate_RoadRunner_traces.md)
 
 ### Trace Formats
 
